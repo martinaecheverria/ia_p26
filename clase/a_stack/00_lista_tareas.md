@@ -15,7 +15,7 @@ Debes leer y entender estos documentos antes de empezar.
 1.  **Curso DataCamp:** [AI Assisted Coding for Developers](https://app.datacamp.com/learn/courses/ai-assisted-coding-for-developers).
     *   *Objetivo:* Aprender a usar IA para programar.
     *   *Entregable:* Screenshot de completado (100%).
-    *   *Estado:* ⏳ **Diferida.** Guarda la evidencia, se subirá en el Módulo 05.
+    *   *Estado:* ⏳ **Diferida.** Guarda la evidencia, se subirá en el Módulo 05 cuando completemos el modulo de github.
 
 ---
 
