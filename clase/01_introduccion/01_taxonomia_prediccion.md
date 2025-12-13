@@ -1,6 +1,11 @@
 # Taxonomía de la Predicción en IA
 
-Una guía completa para entender cómo se aproxima el problema de predicción desde diferentes perspectivas.
+> *"Knowing the future can be a kind of imprisonment."*  
+> — Paul Atreides, Dune
+
+Predecir es un problema fundamental en IA, pero no lo es todo, solo e suna parte del proceso que puede ayudar a los agentes a entender el mundo *¿De dónde viene el conocimiento? ¿Qué significa la incertidumbre? ¿Qué queremos realmente del modelo?*
+
+Empecemos por entender la estructura.
 
 ---
 
@@ -84,7 +89,7 @@ Es un solo número - el "mejor guess" en sentido de mínimo error cuadrático. P
 
 **Nota sobre series de tiempo:**
 Las series de tiempo son un caso especial donde los features X son la **historia de la misma variable Y**:
-- **P(Y_{t+1} | Y_t, Y_{t-1}, ...)** es P(Y|X) donde X = {Y_t, Y_{t-1}, ...}
+- P(Y_{t+1} | Y_t, Y_{t-1}, ...) es P(Y|X) donde X = {Y_t, Y_{t-1}, ...} (pero con diferentes supuestos)
 - Modelos como AR, ARIMA, LSTM, y Transformers temporales usan esta estructura
 - El baseline **E[Y]** sigue siendo relevante: un modelo temporal que no supere "predecir la media histórica" no aporta valor
 - También existe el baseline "naive" de series de tiempo: predecir Y_{t+1} = Y_t (el último valor observado)
@@ -156,7 +161,7 @@ Es diferente de P(Y|X) que solo pregunta "si OBSERVO X". La diferencia es crucia
     P(X,Y,Z) + Estructura Causal ──► P(Y|do(X))
 ```
 
-**Regla clave**: Si conoces una cantidad más general (arriba), puedes derivar las más específicas (abajo). No al revés.
+**Regla clave**: Si conoces una cantidad más general (arriba), puedes derivar las más específicas (abajo). No al revés. Más información siempre puede comprimirse; menos información no puede expandirse.
 
 **¿Por qué ϕ(X) está "debajo" de P(X)?**
 - De P(X) puedes derivar muchas representaciones ϕ(X) (ej: los modos de la distribución, componentes principales)
@@ -175,7 +180,7 @@ E[Y] es el **baseline universal** contra el que todo modelo predictivo debe comp
 - Un R² de 0 significa: "mi modelo sofisticado no es mejor que predecir la media"
 - Un R² negativo significa: "mi modelo es PEOR que predecir la media" (sobreajuste o error)
 
-La pregunta fundamental antes de construir cualquier modelo complejo es: **¿Mis features X realmente ayudan a predecir Y mejor que simplemente usar E[Y]?**
+La pregunta fundamental antes de construir cualquier modelo complejo es: **¿Mis features X realmente ayudan a predecir Y mejor que simplemente usar E[Y]?** Si la respuesta es no, el modelo más sofisticado del mundo no te salvará.
 
 Por ejemplo:
 - De **P(Y|X)** puedes calcular **E[Y|X] = ∫ y · P(y|X) dy**
@@ -183,7 +188,16 @@ Por ejemplo:
 
 ### El problema fundamental: Restricción
 
-**El dilema**:
+> *"The future is always a surprise to those who look too far ahead."*  
+> — Children of Dune
+
+Imagina que tienes tres puntos en un plano y quieres trazar la curva que los conecta. ¿Cuál eliges? Podría ser una línea recta. Podría ser una parábola. Podría ser una onda sinusoidal. Podría ser un garabato que pasa exactamente por los tres puntos y luego hace piruetas absurdas.
+
+Matemáticamente, **todas son válidas**. Los datos — esos tres puntos — no te dicen cuál es "la correcta".
+
+Esta es la paradoja central de la predicción: los datos nunca son suficientes. Siempre necesitas algo más — un supuesto, una creencia, una restricción sobre qué curvas son "razonables". Cada método de predicción es, en el fondo, una respuesta diferente a esta pregunta: *¿qué formas del mundo consideras plausibles?*
+
+**El dilema formal**:
 - Tenemos **datos finitos** (N observaciones)
 - El espacio de funciones posibles es **infinito**
 - Hay infinitos modelos que ajustan perfectamente los datos de entrenamiento
@@ -194,20 +208,24 @@ Todo método de predicción es una forma de **restringir el espacio de hipótesi
 2. **De dónde vienen** esas restricciones
 3. **Cómo se expresan** matemáticamente
 
+De los datos viene el ajuste. De la teoría viene la estructura. De la restricción viene la generalización.
+
 Esta es la base de nuestra taxonomía.
 
 ---
 
+Ahora que entendemos qué significa predecir y por qué necesitamos restringir nuestras hipótesis, podemos preguntarnos: ¿cuáles son las decisiones fundamentales que definen cualquier método de predicción?
+
 ## Parte 1: Las 5 Dimensiones Ortogonales
 
-No existe UNA forma correcta de categorizar los métodos de predicción. Existen **5 ejes independientes** que caracterizan cualquier approach. Cada método es un punto en este espacio 5-dimensional.
+No existe UNA forma correcta de categorizar los métodos de predicción. Pero existe una forma *útil*: pensar en **5 ejes independientes** que caracterizan cualquier enfoque. Cada método es un punto en este espacio 5-dimensional. La magia desaparece cuando puedes nombrar las coordenadas.
 
 ```
-Método = (D1: Fuente de Estructura, 
+Método = (D1: Fuente del Conocimiento Estructural, 
           D2: Interpretación de Probabilidad, 
           D3: Objetivo Matemático, 
           D4: Arquitectura de Variables, 
-          D5: Mecanismo de Restricción)
+          D5: Supuesto Inductivo)
 ```
 
 Las dimensiones son **ortogonales**: puedes elegir cualquier combinación de opciones en cada eje.
@@ -216,9 +234,13 @@ Las dimensiones son **ortogonales**: puedes elegir cualquier combinación de opc
 
 ### Dimensión 1: Fuente del Conocimiento Estructural
 
+> *"In theory, theory and practice are the same. In practice, they are not."*
+
+*Antes de los datos, está la pregunta: ¿qué sabes ya?*
+
 **Pregunta clave**: *"¿De dónde viene la estructura del modelo?"*
 
-Esta es quizás la dimensión más fundamental. Antes de hablar de algoritmos o matemáticas, debemos preguntarnos: ¿qué **sabemos** (o creemos saber) sobre el problema antes de ver los datos?
+Hay dos caminos para saber algo del mundo. El primero dice: *pienso, luego predigo*. El segundo dice: *observo, luego generalizo*. Esta es quizás la dimensión más fundamental. Antes de hablar de algoritmos o matemáticas, debemos preguntarnos: ¿qué **sabemos** (o creemos saber) sobre el problema antes de ver los datos?
 
 | Tipo | Descripción | Ejemplos | Situación real |
 |------|-------------|----------|----------------|
@@ -349,7 +371,7 @@ Es común confundir estos términos porque suelen aparecer juntos, pero son cosa
 | Concepto | ¿Qué es? | Dimensión |
 |----------|----------|-----------|
 | **DSGE** | Un **tipo de modelo** (estructura basada en teoría micro: agentes optimizando, equilibrio general) | D1 (Deductivo) + D4 (Arquitectura de grafo/ecuaciones) |
-| **Calibración** | Una **técnica de estimación** (elegir parámetros para reproducir momentos observados) | D5 (Mecanismo de restricción) |
+| **Calibración** | Una **técnica de estimación** (elegir parámetros para reproducir momentos observados) | D5 (Supuesto inductivo) |
 
 ```
 DSGE puede estimarse con:        Calibración puede aplicarse a:
@@ -361,6 +383,17 @@ DSGE puede estimarse con:        Calibración puede aplicarse a:
 
 En otras palabras: **DSGE es el "qué"** (qué modelo usas), **calibración es el "cómo"** (cómo estimas sus parámetros).
 
+---
+
+**Atrapar una pelota:**
+
+Un niño de 5 años puede atrapar una pelota en el aire. No sabe física. No calcula trayectorias parabólicas ni resuelve ecuaciones diferenciales. Simplemente ha lanzado y atrapado pelotas cientos de veces. Su cerebro aprendió el patrón. Esto es **inductivo**.
+
+Un ingeniero de la NASA calcula exactamente dónde caerá un satélite. Usa las leyes de Newton, la resistencia del aire, la rotación de la Tierra. Nunca ha "practicado" con satélites cayendo — deriva la respuesta de principios físicos. Esto es **deductivo**.
+
+¿Quién predice mejor? El niño falla si le lanzas algo que nunca ha visto — un frisbee, una pluma. El ingeniero puede predecir objetos que nunca ha observado, pero necesita conocer todas las fuerzas involucradas. Puede que el niñe no pueda predecir apriori pero es capaz de atrapar la pelota, el ingeniere puede ser capaz de predecir apriori pero incapaz de atrapar la pelota.
+
+No tienen que ser excluyentes, pueden ser híbridos.
 ---
 
 **Intuición resumida:**
@@ -383,7 +416,17 @@ En otras palabras: **DSGE es el "qué"** (qué modelo usas), **calibración es e
 
 ### Dimensión 2: Interpretación de Probabilidad/Incertidumbre
 
+*La probabilidad es un número. Pero ¿qué significa ese número?*
+
 **Pregunta clave**: *"Cuando digo 'hay 70% de probabilidad de lluvia', ¿qué significa ese número?"*
+
+Dos estadísticos miran la misma moneda.
+
+El **frecuentista** dice: "Existe una probabilidad verdadera de que caiga cara. No la conozco, pero si repito el experimento miles de veces, la frecuencia observada me la revelará."
+
+El **bayesiano** dice: "La moneda ya tiene un lado arriba — solo no lo veo. Mi '50%' no describe la moneda, describe *lo que yo sé*. Si viera cómo la lanzas — el ángulo, la fuerza — mi probabilidad cambiaría. La incertidumbre está en mí, no en ella."
+
+Ninguno está equivocado. El primero habla del mundo. El segundo habla del conocimiento sobre el mundo.
 
 | Interpretación | Filosofía | Qué es un parámetro **θ** | Qué es incertidumbre | Situación real |
 |----------------|-----------|------------------------------|----------------------|----------------|
@@ -447,9 +490,24 @@ Pero siguiendo a Jaynes, incluso lo que llamamos "ruido aleatorio" puede ser epi
 
 **Nota importante**: Puedes ser Deductivo+Frequentist, Deductivo+Bayesian, Inductivo+Frequentist, Inductivo+Bayesian. Son ejes independientes.
 
+**¿Cuándo usar cada interpretación?**
+
+| Situación | Enfoque recomendado |
+|-----------|---------------------|
+| Muchos datos, pocos parámetros | Frequentist (MLE basta) |
+| Pocos datos, conocimiento previo fuerte | Bayesian (priors ayudan) |
+| Necesitas cuantificar incertidumbre en parámetros | Bayesian |
+| A/B testing, experimentos repetibles | Frequentist |
+| Diagnóstico, actualización secuencial | Bayesian |
+| Solo necesitas predicción puntual | Cualquiera (Frequentist más simple) |
+
+> *Estas son heurísticas, no reglas. La elección óptima en esta dimensión depende de las otras cuatro — entender el sistema completo es más importante que optimizar cada eje por separado.*
+
 ---
 
 ### Dimensión 3: Objetivo Matemático
+
+*No todos los que predicen quieren lo mismo.*
 
 **Pregunta clave**: *"¿Qué cantidad estás tratando de estimar?"*
 
@@ -489,9 +547,26 @@ La diferencia clave: **Z es observable** (la tienes en tus datos), **L es latent
 | **Distribución con latentes** | **P(X,L)** | Modelo generativo con espacio latente | Datos faltantes, generación | *VAE*: generar caras nuevas; L captura variaciones |
 | **Predicción de parte de X** | **P(X₂\|X₁)** | Y derivado del mismo X | Pretraining, representaciones | *GPT*: predecir siguiente palabra; *BERT*: predecir palabra enmascarada |
 
+**¿Qué objetivo elegir?**
+
+| Tu necesidad | Objetivo recomendado |
+|--------------|----------------------|
+| Un número (predicción puntual) | **E[Y\|X]** |
+| Probabilidad de cada clase | **P(Y\|X)** |
+| Cuantificar riesgo (colas) | **Qα(Y\|X)** (quantiles) |
+| Tomar decisiones / intervenir | **P(Y\|do(X))** (causal) |
+| Detectar anomalías | **P(X)** (densidad) |
+| Comprimir / representar datos | **ϕ(X)** (embeddings) |
+| Agrupar sin etiquetas | **P(C\|X)** (clustering) |
+| Pretraining para transfer | **P(X₂\|X₁)** (self-supervised) |
+
+> *Estas son heurísticas, no reglas. La elección óptima en esta dimensión depende de las otras cuatro — entender el sistema completo es más importante que optimizar cada eje por separado.*
+
 ---
 
 ### Dimensión 4: Arquitectura de Variables
+
+*Las variables no son islas. O sí lo son — y esa es una decisión.*
 
 **Pregunta clave**: *"¿Las variables solo se usan como inputs, o tienen una relación estructural específica entre ellas?"*
 
@@ -608,14 +683,45 @@ CAUSAL:         X ───do───► Y    (intervención, no solo observaci
                        Z (confounder a controlar)
 ```
 
+**¿Qué arquitectura elegir?**
+
+| Situación | Arquitectura recomendada |
+|-----------|--------------------------|
+| Features intercambiables, sin estructura especial | Flat |
+| Quieres generar datos nuevos | Generativa |
+| Datos ruidosos de múltiples fuentes | Latente |
+| Conoces dependencias entre variables | PGM/Grafo |
+| Necesitas efectos causales | Causal |
+| Datos secuenciales/temporales | PGM temporal (Markov, HMM) |
+| Imágenes, texto, señales | Latente + arquitectura especializada |
+
+> *Estas son heurísticas, no reglas. La elección óptima en esta dimensión depende de las otras cuatro — entender el sistema completo es más importante que optimizar cada eje por separado.*
+
 ---
 
-### Dimensión 5: Mecanismo de Restricción (El "Prior")
+### Dimensión 5: Supuesto Inductivo y Estructural
 
-**Pregunta clave**: *"Dado que tengo datos finitos, ¿qué supuesto adicional uso para elegir entre los infinitos modelos que ajustan los datos?"*
+*Todo modelo hace supuestos sobre cómo funciona el mundo — sin ellos, generalizar sería imposible.*
 
-| Mecanismo | Cómo restringe | Ejemplo | Situación real |
-|-----------|----------------|---------|----------------|
+Este eje captura **qué creencias estructurales** incorpora el modelo. En la literatura se conoce como:
+- **Sesgo inductivo** (inductive bias) — término técnico en ML
+- **Prior** — término bayesiano para creencias previas
+- **Restricción** — porque limita el espacio de hipótesis
+
+Usamos "supuesto" porque enfatiza que es una **decisión filosófica** sobre la naturaleza del problema, no solo una técnica de regularización.
+
+Miguel Ángel decía que la escultura ya existía dentro del mármol — él solo quitaba lo que sobraba. La predicción funciona igual: el espacio de modelos posibles es infinito, y tus supuestos determinan cuáles consideras plausibles.
+
+Cada tipo de supuesto es un cincel diferente:
+- La **arquitectura** asume ciertas invarianzas (espaciales, temporales)
+- La **regularización** asume que funciones simples son más probables
+- Los **priors** expresan creencias explícitas sobre parámetros
+- La **validación** asume que el futuro se parecerá al pasado
+
+**Pregunta clave**: *"Dado que tengo datos finitos, ¿qué supuesto estructural uso para elegir entre los infinitos modelos que ajustan los datos?"*
+
+| Supuesto | Qué asume | Ejemplo | Situación real |
+|----------|-----------|---------|----------------|
 | **Arquitectura** | Limita qué funciones son representables | CNN (invarianza traslacional), Transformer (atención) | *Reconocimiento de objetos*: un gato es gato esté arriba o abajo de la imagen |
 | **Penalización** | Castiga complejidad en la función de pérdida | L2 = funciones suaves, L1 = funciones sparse | *Regresión con muchas variables*: L1 fuerza a usar solo las importantes |
 | **Prior probabilístico** | Distribución explícita sobre parámetros | Prior Gaussiano en pesos, GP kernel | *Pocos datos*: "creo que los parámetros están cerca de cero" |
@@ -625,10 +731,10 @@ CAUSAL:         X ───do───► Y    (intervención, no solo observaci
 | **Invarianza causal** | Solo usar relaciones estables bajo cambio de distribución | IRM, Causal regularization | *Modelo médico* que funcione igual en hospitales diferentes |
 
 **Insight fundamental**: 
-Todo mecanismo de restricción es matemáticamente equivalente a algún tipo de "prior" o creencia sobre qué funciones son más plausibles.
+Todo supuesto inductivo es matemáticamente equivalente a algún tipo de "prior" o creencia sobre qué funciones son más plausibles.
 
-| Restricción | Equivalencia Bayesiana |
-|-------------|------------------------|
+| Supuesto | Equivalencia Bayesiana |
+|----------|------------------------|
 | L2 regularization | Prior Gaussiano sobre pesos |
 | L1 regularization | Prior Laplaciano sobre pesos |
 | Dropout | Prior sobre redes sparse |
@@ -636,15 +742,39 @@ Todo mecanismo de restricción es matemáticamente equivalente a algún tipo de 
 | Propiedad de Markov | Prior de independencia condicional temporal |
 | Validación cruzada | Prior implícito de generalización |
 
+**¿Qué supuesto elegir?**
+
+| Situación | Supuesto recomendado |
+|-----------|----------------------|
+| Invarianza espacial conocida (imágenes) | Arquitectura (CNN) |
+| Invarianza secuencial (texto, tiempo) | Arquitectura (Transformer, RNN) |
+| Muchas features, pocas relevantes | Penalización L1 (sparsity) |
+| Quieres funciones suaves | Penalización L2 |
+| Conocimiento previo sobre parámetros | Prior probabilístico |
+| Datos temporales | Propiedad de Markov |
+| Modelo teórico con parámetros libres | Calibración/Momentos |
+| No sabes qué supuesto usar | Validación cruzada |
+| Modelo debe funcionar en múltiples contextos | Invarianza causal |
+
+> *Estas son heurísticas, no reglas. La elección óptima en esta dimensión depende de las otras cuatro — entender el sistema completo es más importante que optimizar cada eje por separado.*
+
 ---
+
+Con las cinco dimensiones en mano, podemos ubicar cualquier método concreto como un punto en este espacio. Lo que sigue es un atlas de los métodos más comunes — no exhaustivo, pero sí representativo.
 
 ## Parte 2: Matriz de Métodos
 
-Cada método concreto es un punto en el espacio 5D. Aquí está la ubicación de los métodos más comunes.
+Cada método concreto es un punto en el espacio 5D. Las tablas siguientes ubican los métodos más comunes — no como una lista para memorizar, sino como un mapa para orientarse.
 
 ### Métodos Supervisados (con Y)
 
-| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Restricción | Caso de uso típico |
+En aprendizaje supervisado tenemos pares **(X, Y)** y queremos aprender la relación entre ellos. La mayoría de estos métodos son **inductivos** (aprenden de datos) y **frecuentistas** (optimizan una función de pérdida). Las diferencias principales están en:
+
+- **Objetivo**: ¿Queremos el valor esperado **E[Y|X]** o la distribución completa **P(Y|X)**?
+- **Supuesto**: ¿Qué estructura asumimos? (regularización, arquitectura, priors)
+- **Arquitectura**: ¿Asumimos estructura plana, grafos, o relaciones causales?
+
+| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Supuesto | Caso de uso típico |
 |--------|------------|----------|--------------|------------------|-----------------|-------------------|
 | **Regresión Lineal** | Inductivo | Freq | **E[Y\|X]** | Flat | Ninguna/L2 | Predicción de ventas simple |
 | **Ridge/Lasso** | Inductivo | Freq | **E[Y\|X]** | Flat | L2/L1 | Muchas features, pocas observaciones |
@@ -665,7 +795,15 @@ Cada método concreto es un punto en el espacio 5D. Aquí está la ubicación de
 
 ### Métodos No Supervisados (sin Y)
 
-| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Restricción | Caso de uso típico |
+Sin variable objetivo **Y**, el problema cambia: ¿qué podemos aprender solo de **X**? Las respuestas principales son:
+
+- **P(X)**: Modelar la distribución de los datos (densidad, generación, detección de anomalías)
+- **ϕ(X)**: Encontrar representaciones comprimidas (embeddings, reducción de dimensión)
+- **Clusters**: Agrupar observaciones similares
+
+Casi todos usan arquitectura **latente** — asumen que hay estructura oculta que explica los datos observados.
+
+| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Supuesto | Caso de uso típico |
 |--------|------------|----------|--------------|------------------|-----------------|-------------------|
 | **K-Means** | Inductivo | Freq | Clusters | Flat | K fijo | Segmentación de clientes |
 | **Gaussian Mixture Model** | Inductivo | Freq/Bayes | **P(X)** | Latente | Mezcla Gaussiana | Clustering probabilístico |
@@ -680,7 +818,15 @@ Cada método concreto es un punto en el espacio 5D. Aquí está la ubicación de
 
 ### Métodos Self-Supervised
 
-| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Restricción | Caso de uso típico |
+El aprendizaje auto-supervisado es un truco ingenioso: **crear Y a partir de X**. En lugar de etiquetar datos manualmente, diseñamos tareas donde la supervisión viene de los datos mismos:
+
+- **Predecir la siguiente palabra** (GPT): Y = siguiente token, X = tokens anteriores
+- **Predecir palabras ocultas** (BERT): Y = palabra enmascarada, X = contexto
+- **Comparar versiones aumentadas** (SimCLR): Y = "misma imagen", X = dos augmentaciones
+
+El objetivo real no es resolver estas tareas — es aprender **representaciones ϕ(X)** útiles para tareas downstream.
+
+| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Supuesto | Caso de uso típico |
 |--------|------------|----------|--------------|------------------|-----------------|-------------------|
 | **Word2Vec** | Inductivo | Freq | **P(ctx\|word)** | Latente | Ventana de contexto | Embeddings de palabras |
 | **BERT** | Inductivo | Freq | **P(Xₘₐₛₖ\|Xᵣₑₛₜₒ)** | Latente | Transformer | Embeddings de texto |
@@ -691,7 +837,19 @@ Cada método concreto es un punto en el espacio 5D. Aquí está la ubicación de
 
 ### Métodos Secuenciales/Temporales (Markov)
 
-| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Restricción | Caso de uso típico |
+Cuando los datos tienen estructura temporal, la **propiedad de Markov** es una restricción poderosa: el futuro solo depende del presente, no de toda la historia.
+
+**P(Xₜ₊₁ | X₁, X₂, ..., Xₜ) = P(Xₜ₊₁ | Xₜ)**
+
+Esta simplificación hace tratable modelar secuencias largas. Los métodos varían en:
+
+- **Observable vs Latente**: ¿El estado es visible (Markov Chain) o hay que inferirlo (HMM, Kalman)?
+- **Lineal vs No lineal**: ¿Las transiciones son lineales (Kalman) o arbitrarias (Particle Filter)?
+- **Discreto vs Continuo**: ¿Estados discretos (HMM) o continuos (Kalman)?
+
+Son **híbridos** en D1 porque combinan estructura teórica (la propiedad de Markov) con estimación de parámetros desde datos.
+
+| Método | D1: Fuente | D2: Prob | D3: Objetivo | D4: Arquitectura | D5: Supuesto | Caso de uso típico |
 |--------|------------|----------|--------------|------------------|-----------------|-------------------|
 | **Cadena de Markov** | Híbrido | Freq | **P(X_{t+1}\|X_t)** | Grafo | Propiedad Markov | Transiciones de estados, PageRank |
 | **HMM** | Híbrido | Freq/Bayes | **P(Y\|L), P(L_{t+1}\|L_t)** | Latente+Grafo | Markov + Emisión | Reconocimiento de voz, genómica |
@@ -702,9 +860,9 @@ Cada método concreto es un punto en el espacio 5D. Aquí está la ubicación de
 
 Los modelos de "IA Generativa" que dominan hoy (ChatGPT, Stable Diffusion, DALL-E, Midjourney) son combinaciones específicas en nuestra taxonomía de 5 dimensiones:
 
-| Modelo | Tipo | D1 | D2 | D3: Objetivo | D4: Arquitectura | D5: Restricción |
+| Modelo | Tipo | D1 | D2 | D3: Objetivo | D4: Arquitectura | D5: Supuesto |
 |--------|------|----|----|--------------|------------------|-----------------|
-| **GPT-4 / LLaMA** | LLM | Inductivo | Freq | **P(Xₜ₊₁\|X₁:ₜ)** | Latente | Transformer + Scale |
+| **GPT / LLaMA** | LLM | Inductivo | Freq | **P(Xₜ₊₁\|X₁:ₜ)** | Latente | Transformer + Scale |
 | **Claude / Gemini** | LLM | Inductivo | Freq | **P(Xₜ₊₁\|X₁:ₜ)** | Latente | Transformer + RLHF |
 | **BERT** | Encoder | Inductivo | Freq | **P(Xₘₐₛₖ\|Xᵣₑₛₜₒ)** | Latente | Transformer (bidireccional) |
 | **Stable Diffusion** | Imagen | Inductivo | Freq | **P(X\|texto)** | Latente | U-Net + Diffusion |
@@ -715,7 +873,7 @@ Los modelos de "IA Generativa" que dominan hoy (ChatGPT, Stable Diffusion, DALL-
 **Insight clave**: Todos comparten:
 - **D1: Inductivo** - aprenden de datos masivos, no de teoría
 - **D4: Latente** - trabajan con representaciones internas comprimidas
-- La diferencia está en **D3** (qué predicen) y **D5** (qué arquitectura/restricción usan)
+- La diferencia está en **D3** (qué predicen) y **D5** (qué supuesto/arquitectura usan)
 
 **¿Cómo funcionan?**
 
@@ -756,9 +914,11 @@ DIFFUSION (Stable Diffusion, DALL-E, Midjourney):
 
 ---
 
-## Parte 3: Guía de Decisión
+Saber que existen cinco dimensiones es útil. El siguiente diagrama muestra cómo se relacionan las dimensiones entre sí — no es una guía de qué elegir, sino un mapa de las opciones disponibles.
 
-### Árbol de decisión
+## Parte 3: Mapa Visual de la Taxonomía
+
+### Flujo de las 5 dimensiones
 
 ```mermaid
 flowchart TD
@@ -828,7 +988,7 @@ flowchart TD
     D4B_LAT --> Q6
     D4B_GEN --> Q6
     
-    Q6{"<b>D5: RESTRICCIÓN</b><br/>¿Cómo limitas el espacio de hipótesis?"}
+    Q6{"<b>D5: SUPUESTO INDUCTIVO</b><br/>¿Qué estructura asumes?"}
     
     Q6 -->|"Simetría/Invarianza"| D5_ARQ["<b>ARQUITECTURA</b><br/><b>CNN</b>, <b>Transformer</b>"]
     Q6 -->|"Penalizar complejidad"| D5_PEN["<b>REGULARIZACIÓN</b><br/><b>L1</b>, <b>L2</b>, Dropout"]
@@ -838,7 +998,7 @@ flowchart TD
     Q6 -->|"Independencia temporal"| D5_MRK["<b>MARKOV</b><br/><b>P(Xₜ₊₁|Xₜ)</b>"]
 ```
 
-### Preguntas diagnósticas rápidas
+### Combinaciones comunes
 
 | Si tu situación es... | Considera... |
 |-----------------------|--------------|
@@ -856,7 +1016,67 @@ flowchart TD
 
 ---
 
-## Parte 4: Casos de Estudio
+## Parte 4: Heurísticas para Elegir
+
+> **Advertencia**: Lo que sigue son heurísticas, no reglas. Son puntos de partida para orientar la exploración, no respuestas definitivas. El contexto siempre manda.
+
+### Heurísticas por dimensión
+
+Cada dimensión tiene preguntas que ayudan a elegir:
+
+**D1: Fuente de Conocimiento**
+- Pregunta: *¿Tienes teoría validada del fenómeno?*
+- Sí → Deductivo o Híbrido
+- No → Inductivo
+- ¿Pocos datos? → Híbrido puede ayudar
+
+**D2: Interpretación de Probabilidad**
+- Pregunta: *¿Necesitas incertidumbre sobre los parámetros?*
+- Sí → Bayesiano
+- Solo predicción puntual → Frequentist suele bastar
+
+**D3: Objetivo Matemático**
+- Pregunta: *¿Qué harás con la predicción?*
+- Decisión binaria → **P(Y|X)**
+- Un número → **E[Y|X]**
+- Cuantificar riesgo → Quantiles
+- Intervenir/causar → **do(X)**
+
+**D4: Arquitectura de Variables**
+- Pregunta: *¿Hay estructura conocida entre variables?*
+- Sí, dependencias explícitas → PGM/Grafo
+- Datos de alta dimensión → Latente
+- Sin estructura especial → Flat
+
+**D5: Supuesto Inductivo**
+- Pregunta: *¿Qué invariancias o estructura conoces del problema?*
+- Invarianza espacial → CNN
+- Invarianza secuencial → Transformer/Markov
+- No sé → Regularización + Cross-validation
+
+### Reglas generales (aproximadas)
+
+Algunas combinaciones que suelen funcionar:
+
+- **Pocos datos + mucha teoría** → Deductivo o Híbrido + Bayesiano + PGM
+- **Muchos datos + poca teoría** → Inductivo + Frequentist + DNN o Gradient Boosting
+- **Necesitas explicar el modelo** → PGM, modelos lineales, evitar cajas negras
+- **Necesitas efectos causales** → Arquitectura Causal (no hay atajo)
+- **Alta dimensión (imágenes, texto, audio)** → Arquitectura especializada es casi obligatoria (CNN, Transformer)
+- **Series de tiempo** → Propiedad de Markov + arquitectura temporal (LSTM, Transformer)
+
+### Lo que las heurísticas NO te dicen
+
+- **Qué features usar** — eso es conocimiento de dominio
+- **Cuántos datos son "suficientes"** — depende de la complejidad del problema
+- **Si el modelo funcionará** — solo los datos de prueba te dirán
+- **Cuál es el mejor hiperparámetro** — eso es validación cruzada
+
+> **Nota final**: Estas heurísticas son mapas aproximados. El territorio real es tu problema específico — con sus datos, sus requisitos, sus restricciones. No existe receta universal. El objetivo es reducir el espacio de búsqueda, no eliminarlo.
+
+---
+
+## Parte 5: Casos de Estudio
 
 ### Caso 1: Economía Macroeconómica (DSGE)
 
@@ -868,7 +1088,7 @@ flowchart TD
 | D2: Probabilidad | **Frequentist** (o Bayesian en bancos centrales modernos) | Calibrar a momentos observados |
 | D3: Objetivo | **P(Y\|X)** | Distribución de outcomes dado shocks |
 | D4: Arquitectura | **Grafo** | Sistema de ecuaciones con dependencias explícitas |
-| D5: Restricción | **Momentos/Calibración** | Ajustar para reproducir volatilidades, correlaciones observadas |
+| D5: Supuesto | **Momentos/Calibración** | Ajustar para reproducir volatilidades, correlaciones observadas |
 
 **Flujo**:
 ```
@@ -893,7 +1113,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Frequentist** | Optimizar cross-entropy loss |
 | D3: Objetivo | **P(Y\|X)** via softmax | Distribución sobre clases |
 | D4: Arquitectura | **Flat** (pero CNN impone estructura) | Todas las features → output |
-| D5: Restricción | **Arquitectura (CNN)** | Invarianza traslacional: objeto es igual donde sea en la imagen |
+| D5: Supuesto | **Arquitectura (CNN)** | Invarianza traslacional: objeto es igual donde sea en la imagen |
 
 **Por qué CNN**:
 - Un gato en la esquina superior izquierda es el mismo gato que en el centro
@@ -912,7 +1132,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Bayesian** | Necesitas incertidumbre para decisiones de vida/muerte |
 | D3: Objetivo | **P(Y\|do(X))** | ¿Qué pasa si DOY este tratamiento? (causal) |
 | D4: Arquitectura | **Causal** | Distinguir correlación de causación |
-| D5: Restricción | **Prior clínico** | Conocimiento médico previo sobre efectos |
+| D5: Supuesto | **Prior clínico** | Conocimiento médico previo sobre efectos |
 
 **Por qué causal**:
 - Pacientes que reciben tratamiento A pueden ser diferentes de los que reciben B (confounding)
@@ -931,7 +1151,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Frequentist** | Estimar quantiles empíricos |
 | D3: Objetivo | **Q₀.₀₅(Y\|X)** | El percentil 5, no la media |
 | D4: Arquitectura | **Flat** | Features de mercado → pérdida |
-| D5: Restricción | **Validación** | Backtesting en datos históricos |
+| D5: Supuesto | **Validación** | Backtesting en datos históricos |
 
 **Por qué quantiles, no media**:
 - La media de pérdidas es irrelevante para riesgo
@@ -950,7 +1170,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Frequentist** | Maximizar likelihood |
 | D3: Objetivo | **P(Xₜ₊₁\|X₁:ₜ)** (GPT) o **P(Xₘₐₛₖ\|Xᵣₑₛₜₒ)** (BERT) | Self-supervised: Y se deriva de X |
 | D4: Arquitectura | **Latente** | Aprender representación oculta del lenguaje |
-| D5: Restricción | **Arquitectura Transformer** | Atención permite capturar dependencias largas |
+| D5: Supuesto | **Arquitectura Transformer** | Atención permite capturar dependencias largas |
 
 **Por qué self-supervised**:
 - Etiquetar texto para cada tarea es costosísimo
@@ -969,7 +1189,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Frequentist** | Estimar densidad |
 | D3: Objetivo | **P(X)** | Transacciones anómalas = baja probabilidad |
 | D4: Arquitectura | **Flat** | Features de transacción |
-| D5: Restricción | **Densidad/Ensemble** | KDE, Isolation Forest |
+| D5: Supuesto | **Densidad/Ensemble** | KDE, Isolation Forest |
 
 **Por qué unsupervised**:
 - Hay muy pocos ejemplos de fraude etiquetado
@@ -988,7 +1208,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Bayesian** | Actualizar creencia sobre posición con cada medición |
 | D3: Objetivo | **P(L\|X,Z)** | Distribución de posición latente dado sensores |
 | D4: Arquitectura | **Latente** | Posición real L genera observaciones ruidosas X, Z |
-| D5: Restricción | **Modelo de proceso (Kalman)** | Física del movimiento como prior |
+| D5: Supuesto | **Modelo de proceso (Kalman)** | Física del movimiento como prior |
 
 **Por qué latente + Bayesian**:
 - La posición real es UNA, pero la medimos con múltiples sensores ruidosos
@@ -1007,7 +1227,7 @@ Teoría microeconómica ──► Ecuaciones estructurales ──► Parámetros
 | D2: Probabilidad | **Frequentist** | Minimizar error de reconstrucción |
 | D3: Objetivo | **E[Y\|X]** | Estado futuro del fluido dado inicial |
 | D4: Arquitectura | **Flat** (con estructura de física en loss) | Features → estado |
-| D5: Restricción | **Ecuaciones diferenciales** | Loss incluye residual de Navier-Stokes |
+| D5: Supuesto | **Ecuaciones diferenciales** | Loss incluye residual de Navier-Stokes |
 
 **Por qué Physics-Informed**:
 - Resolver ecuaciones exactas es muy lento
@@ -1071,21 +1291,40 @@ LATENTE:        X ───► L ───► X̂  (L es inferido, no observado)
 
 ---
 
-## Conclusión
+## Reflexión Final
 
-La predicción en IA no es un problema monolítico con una solución única. Es un espacio multidimensional donde cada método representa una combinación de decisiones sobre:
+> *"All models are wrong, but some are useful."*  
+> — George Box
 
-1. **De dónde viene el conocimiento** (teoría vs datos)
-2. **Qué significa probabilidad** (frecuencia vs creencia)
-3. **Qué cantidad estimar** (media, distribución, efecto causal, representación)
-4. **Cómo se relacionan las variables** (flat, estructurado, latente, causal)
-5. **Cómo restringir el espacio de hipótesis** (arquitectura, penalización, priors, calibración)
+Hemos recorrido un territorio vasto. Desde los axiomas de la física hasta las redes neuronales de mil millones de parámetros. Desde el teorema de Bayes hasta los filtros de Kalman. Desde la humilde media aritmética hasta los efectos causales que distinguen correlación de intervención.
 
-No hay método universalmente mejor. La elección óptima depende de:
-- Qué conocimiento previo tienes
-- Qué necesitas del output
-- Cuántos datos tienes
-- Qué garantías necesitas
-- Qué estructura tiene tu problema
+Pero si tuvieras que quedarte con una sola idea, que sea esta: **no existe el método de predicción**. No hay algoritmo universalmente superior, ni paradigma que los gobierne a todos. Lo que existe es un espacio de decisiones — cinco dimensiones donde cada elección tiene consecuencias, donde cada supuesto abre puertas y cierra otras.
 
-Esta taxonomía te permite **decodificar** cualquier método nuevo encontrando su posición en las 5 dimensiones, y **diseñar** soluciones eligiendo conscientemente en cada eje.
+La predicción, al final, es un acto de humildad disfrazado de confianza. Decimos "el modelo predice X" cuando en realidad queremos decir "dados estos supuestos, estos datos, y estas restricciones, nuestra mejor estimación es X". La honestidad está en conocer los supuestos. La sabiduría está en elegirlos bien.
+
+---
+
+
+- *¿De dónde viene su conocimiento?* ¿De teoría, de datos, o de ambos?
+- *¿Cómo trata la incertidumbre?* ¿Como frecuencia o como creencia?
+- *¿Qué intenta estimar?* ¿Una media, una distribución, un efecto causal?
+- *¿Qué estructura asume?* ¿Variables planas, grafos, latentes?
+- *¿Cómo restringe las hipótesis?* ¿Con arquitectura, regularización, priors?
+Apunta a  **entender qué estamos haciendo cuando intentamos predecirlo**.
+
+---
+
+> *"The oracle sees, but cannot choose."*  
+> — Dune Messiah
+
+> *«La información no es suficiente para garantizar la vida.»*  
+> — Ghost in the Shell (1995)
+
+Este documento ha tratado sobre **ver** — sobre estimar, predecir, cuantificar incertidumbre. Pero ver no es actuar. El oráculo ve el futuro, pero eso no le dice qué hacer con esa visión.
+
+Existe en el campo una especie de **fetiche con la predicción** — en el sentido casi marxista del término: una fascinación con el objeto (el modelo, la métrica, el accuracy) que oscurece las relaciones subyacentes. Nos obsesionamos con P(Y|X) y olvidamos preguntar: ¿para qué queremos saber Y? ¿Qué haremos con esa predicción?
+
+Porque la inteligencia artificial no es, en su esencia, sobre predicción. Es sobre **agentes**, sobre **decisiones**, sobre sistemas que actúan en el mundo y aprenden de las consecuencias. Es sobre inteligencia — la capacidad de adaptarse, de elegir, de perseguir objetivos en entornos inciertos. La predicción es una herramienta, no el fin.
+
+Los LLMs han ayudado a recordarnos esto. Después de años de obsesión con benchmarks de clasificación y métricas de regresión, los modelos de lenguaje trajeron de vuelta la conversación sobre **agentes**: sistemas que razonan, que planean, que interactúan. Que no solo predicen la siguiente palabra, sino que la usan para lograr algo.
+
