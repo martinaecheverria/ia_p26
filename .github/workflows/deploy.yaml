@@ -55,18 +55,16 @@ jobs:
         run: python3 uu_framework/scripts/preprocess.py --verbose
 
       - name: Build site with Eleventy
-        working-directory: uu_framework/eleventy
-        run: npx @11ty/eleventy --config=.eleventy.js
+        run: ./uu_framework/eleventy/node_modules/.bin/eleventy --config=uu_framework/eleventy/.eleventy.js
         env:
           NODE_ENV: production
           PATH_PREFIX: "/${{ github.event.repository.name }}/"
 
       - name: Build CSS with Tailwind
-        working-directory: uu_framework/eleventy
         run: |
-          mkdir -p ../../_site/css/themes
-          npx tailwindcss -i ./src/css/main.css -o ../../_site/css/styles.css --minify
-          cp -r ./src/css/themes/*.css ../../_site/css/themes/
+          mkdir -p _site/css/themes
+          ./uu_framework/eleventy/node_modules/.bin/tailwindcss -c uu_framework/eleventy/tailwind.config.js -i uu_framework/eleventy/src/css/main.css -o _site/css/styles.css --minify
+          cp uu_framework/eleventy/src/css/themes/*.css _site/css/themes/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
