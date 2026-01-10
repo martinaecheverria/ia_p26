@@ -22,6 +22,7 @@ def get_sort_key(name: str) -> tuple:
     Generate sort key for a file/directory name.
 
     Returns tuple for proper sorting:
+    - (-1, 0, 0, '') for utility pages (aleatorio, etc.) - before all content
     - (0, num, 0, '') for numbered items (01_, 02_)
     - (0, num, 1, letter) for lettered sub-items (01_a_, 01_b_)
     - (1, ord, 0, '') for appendices (a_, b_, A_, B_)
@@ -29,8 +30,13 @@ def get_sort_key(name: str) -> tuple:
     - (3, 0, 0, '') for code directories
     - (4, ord, 0, '') for z_ prefixed items (documentation, always last)
 
-    Order: numbered content → appendices → other → code → z_ docs
+    Order: utility pages → numbered content → appendices → other → code → z_ docs
     """
+    # Special utility pages - should appear at the very top
+    utility_pages = ['aleatorio.md', 'aleatorio']
+    if name.lower() in utility_pages or name.lower().replace('.md', '') in utility_pages:
+        return (-1, 0, 0, '')
+
     # Numbered items: 01_, 02_, etc.
     match = re.match(r'^(\d+)_', name)
     if match:
@@ -296,6 +302,26 @@ def generate_hierarchy(
                 tree['children'].append(child)
                 if verbose:
                     print(f"      Added: {item.name}")
+        elif item.suffix == '.md':
+            # Include root-level markdown files (except index files, README, and top-bar-only pages)
+            if item.name not in ['00_index.md', 'README_FLOW.md', 'aleatorio.md']:
+                rel_file = item.name
+                file_meta = metadata.get(rel_file, {})
+
+                # Check if this is a utility page (no numbers)
+                is_utility = get_sort_key(item.name)[0] == -1
+
+                tree['children'].append({
+                    'name': item.name,
+                    'path': rel_file,
+                    'type': 'file',
+                    'title': file_meta.get('title', title_from_filename(item.stem)),
+                    'order': get_sort_key(item.name),
+                    'summary': file_meta.get('summary'),
+                    'no_number': is_utility,  # Utility pages don't show numbers
+                })
+                if verbose:
+                    print(f"      Added file: {item.name}")
 
     # Sort top-level children
     tree['children'] = sorted(tree['children'], key=lambda x: x['order'])

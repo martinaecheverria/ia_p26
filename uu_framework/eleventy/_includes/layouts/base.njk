@@ -269,6 +269,10 @@
       </button>
 
       <nav class="flex items-center text-sm text-text-muted ml-2 lg:ml-0 overflow-hidden">
+        <a href="{{ '/aleatorio/' | url }}" class="hover:text-accent transition-colors flex-shrink-0">Aleatorio</a>
+        <svg class="w-4 h-4 mx-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
         {% if breadcrumbs and breadcrumbs.length > 0 %}
         <a href="{{ '/' | url }}" class="hover:text-accent transition-colors flex-shrink-0">Inicio</a>
         {% for crumb in breadcrumbs %}

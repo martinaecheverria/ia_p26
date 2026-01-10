@@ -163,6 +163,8 @@ module.exports = function(eleventyConfig) {
         if (item.inputPath.includes('b_libros')) return false;
         if (item.inputPath.includes('README_FLOW')) return false;
         if (item.inputPath.includes('task-pages')) return false;
+        // Exclude top-bar-only utility pages
+        if (item.inputPath.includes('aleatorio.md')) return false;
         // Exclude work-in-progress (??_) directories
         if (item.inputPath.includes('??_')) return false;
         return true;

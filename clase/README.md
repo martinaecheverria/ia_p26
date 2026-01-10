@@ -1,7 +1,10 @@
 ---
 title: "Inteligencia Artificial"
 layout: layouts/base.njk
+permalink: /
 ---
+
+![Landing Page]({{ '/images/landing_page.png' | url }})
 
 # Inteligencia Artificial
 **ITAM - Primavera 2026**
