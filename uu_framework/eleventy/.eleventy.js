@@ -72,6 +72,9 @@ module.exports = function(eleventyConfig) {
   // Copy images from content (explicitly from images directory only)
   eleventyConfig.addPassthroughCopy("images/**/*.{png,jpg,jpeg,gif,svg,webp}");
 
+  // Copy PDF files from content
+  eleventyConfig.addPassthroughCopy("**/*.pdf");
+
   // Copy favicon files to site root
   eleventyConfig.addPassthroughCopy("*.ico");
   eleventyConfig.addPassthroughCopy("apple-touch-icon.png");

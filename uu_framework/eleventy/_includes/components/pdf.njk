@@ -1,0 +1,33 @@
+{# PDF Viewer Component
+   Usage: {% pdf "path/to/file.pdf", "Optional Title" %}
+#}
+{% macro render(pdfPath, title) %}
+<div class="pdf-viewer-container my-6">
+  {% if title %}
+  <h3 class="text-xl font-bold mb-4">{{ title }}</h3>
+  {% endif %}
+  
+  <div class="border border-border rounded-lg overflow-hidden bg-bg-secondary">
+    <iframe 
+      src="{{ pdfPath | url }}" 
+      width="100%" 
+      height="800px" 
+      style="border: none;"
+      title="PDF Viewer">
+    </iframe>
+  </div>
+  
+  <div class="mt-4 flex gap-4">
+    <a href="{{ pdfPath | url }}" 
+       target="_blank" 
+       class="inline-flex items-center px-4 py-2 bg-accent text-white rounded hover:opacity-90 transition-opacity">
+      📄 Abrir en nueva pestaña
+    </a>
+    <a href="{{ pdfPath | url }}" 
+       download 
+       class="inline-flex items-center px-4 py-2 border border-accent text-accent rounded hover:bg-accent hover:text-white transition-colors">
+      📥 Descargar PDF
+    </a>
+  </div>
+</div>
+{% endmacro %}

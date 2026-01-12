@@ -66,6 +66,10 @@ jobs:
           ./uu_framework/eleventy/node_modules/.bin/tailwindcss -c uu_framework/eleventy/tailwind.config.js -i uu_framework/eleventy/src/css/main.css -o _site/css/styles.css --minify
           cp uu_framework/eleventy/src/css/themes/*.css _site/css/themes/
 
+      - name: Copy favicon files
+        run: |
+          cp clase/favicon.ico clase/apple-touch-icon.png _site/ 2>/dev/null || true
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
