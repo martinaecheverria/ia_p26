@@ -162,7 +162,7 @@ Si Git te da errores rojos y feos:
     > ¿Cómo lo soluciono sin borrar mi carpeta personal? Recuerda que uso un flujo de Feature Branch."
 
 
-:::exam{id="EX-01" title="Segundo Parcial: Git y GitHub" date="2026-02-04" points="10" duration="20 minutos"}
+:::exam{id="EX-02" title="Segundo Parcial: Git y GitHub" date="2026-02-04" points="10" duration="20 minutos"}
 
 Va a curbir la parte de git y github, y como subir evidencia de certificaciones.  
 Es literalmente aprender el flujo de trabajo de git y github, que se debe hacer y que no se debe hacer. 
