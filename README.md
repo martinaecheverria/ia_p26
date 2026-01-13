@@ -4,7 +4,7 @@
 
 ![Landing Page](clase/images/landing_page.png)
 
-Bienvenido al curso de Inteligencia Artificial.
+Bienvenidx al curso de Inteligencia Artificial.
 
 ## Enlaces
 
@@ -26,7 +26,10 @@ Bienvenido al curso de Inteligencia Artificial.
 # Iniciar servidor de desarrollo
 docker compose -f uu_framework/docker/docker-compose.yaml up dev
 
-# Visitar: http://localhost:3000/ia_p26/
+# Visitar: http://localhost:3000/{repo-name}/ (e.g., http://localhost:3000/ia_p26/)
 ```
 
 Ver documentación completa en `uu_framework/docs/`
+
+## Contacto
+mario.vazquez.corte@itam.mx

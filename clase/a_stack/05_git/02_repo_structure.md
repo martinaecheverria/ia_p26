@@ -151,12 +151,12 @@ Tu primera misión es crear tu "oficina" dentro del repositorio.
 
 ## Setup del Repositorio (Fork y Clone)
 
-Sigue estos pasos con cuidado. Usaremos el repositorio oficial de la clase: `https://github.com/sonder-art/ia_p26`
+Sigue estos pasos con cuidado. Usaremos el repositorio oficial de la clase: `https://github.com/{org}/{repo-name}`
 
 ### 1. Fork (Bifurcación)
 **Paso Crítico:** No trabajaremos directamente sobre mi repositorio, sino sobre una copia tuya vinculada al mío.
 
-1.  Ve a [https://github.com/sonder-art/ia_p26](https://github.com/sonder-art/ia_p26).
+1.  Ve a [https://github.com/{org}/{repo-name}](https://github.com/{org}/{repo-name}).
 2.  Arriba a la derecha, dale click al botón **Fork**.
 3.  GitHub te pedirá confirmar el nombre del repositorio.
     *   Puedes dejarlo como `ia_p26` (recomendado).
@@ -177,7 +177,7 @@ Tu computadora sabe que `origin` es TU repositorio (tu fork). Pero necesita sabe
 Ejecuta esto en tu terminal dentro de la carpeta del proyecto:
 
 ```bash
-git remote add upstream git@github.com:sonder-art/ia_p26.git
+git remote add upstream git@github.com:{org}/{repo-name}.git
 ```
 
 Para verificar:

@@ -68,7 +68,7 @@ Phase 3: Tailwind CSS (tailwind.config.js)
 
 **Content Exclusions**: Files matching patterns in `uu_framework/config/site.yaml` (like `b_libros/`, `flow.sh`, `??_*` directories) are excluded from rendering but may still be present in the repository.
 
-**Path Prefix**: All URLs are prefixed with `/ia_p26/` (configured in `.eleventy.js` and `site.yaml`) for GitHub Pages deployment at `sonder.art/ia_p26/`.
+**Path Prefix**: Auto-detected from git remote (e.g., `/ia_p26/`). The framework reads the repository name from `git config --get remote.origin.url` during preprocessing and generates `repo.json`, which Eleventy uses for URL prefixing. Configurable via `site.yaml` or `PATH_PREFIX` environment variable.
 
 ### File Naming Convention
 
@@ -130,7 +130,7 @@ All Docker commands must be run from the repository root:
 ```bash
 # Start dev server with hot reload (most common)
 docker compose -f uu_framework/docker/docker-compose.yaml up dev
-# → Runs preprocessing, builds site, starts BrowserSync at http://localhost:3000/ia_p26/
+# → Runs preprocessing (auto-detects repo), builds site, starts BrowserSync
 # → Watches for file changes and auto-rebuilds
 
 # Production build (for deployment)
@@ -142,7 +142,7 @@ docker compose -f uu_framework/docker/docker-compose.yaml run preprocess
 # → Runs only Python scripts, outputs JSON to _data/ with --verbose flag
 ```
 
-**Important**: Dev server runs at `http://localhost:3000/ia_p26/` (note the path prefix).
+**Important**: Dev server runs at `http://localhost:3000/{repo-name}/` (e.g., `http://localhost:3000/ia_p26/` for this repo).
 
 ### Git Workflow Script (flow.sh)
 
@@ -158,7 +158,7 @@ Student-focused wrapper for common Git operations:
 ./clase/flow.sh copy <src> <dest>  # Copy files with safety checks
 ```
 
-**Upstream repository**: `git@github.com:sonder-art/ia_p26.git`
+**Upstream repository**: Auto-detected from git remote (for this repo: `git@github.com:sonder-art/ia_p26.git`)
 **Student workflow**: Work in `estudiantes/<username>/`, commit to feature branches, push to personal forks, create PRs to upstream.
 
 ## Development Guidelines
@@ -251,8 +251,8 @@ These are processed separately from course content and rendered to `/docs/` URLs
 1. Create or modify markdown files in `clase/`
 2. Follow naming conventions (`01_chapter/`, `00_index.md`)
 3. Run dev server: `docker compose -f uu_framework/docker/docker-compose.yaml up dev`
-4. Preview at `http://localhost:3000/ia_p26/`
-5. Preprocessing runs automatically, generates fresh JSON data
+4. Preview at `http://localhost:3000/{repo-name}/` (auto-detected)
+5. Preprocessing runs automatically, auto-detects repo config, generates fresh JSON data
 
 ### Debugging Build Issues
 

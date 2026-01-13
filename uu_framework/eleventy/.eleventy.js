@@ -274,9 +274,33 @@ module.exports = function(eleventyConfig) {
   // Configuration
   // ============================================
 
-  // Path prefix can be set via environment variable for different repos
-  // Default to repo name from config or fallback
-  const pathPrefix = process.env.PATH_PREFIX || "/ia_p26/";
+  // Path prefix priority: 1) ENV var, 2) repo.json (from preprocessing), 3) ERROR
+  let pathPrefix = process.env.PATH_PREFIX;
+
+  if (!pathPrefix) {
+    try {
+      // Try to read from generated repo.json
+      const fs = require('fs');
+      const repoDataPath = path.join(__dirname, '_data', 'repo.json');
+      const repoData = JSON.parse(fs.readFileSync(repoDataPath, 'utf-8'));
+
+      if (!repoData.base_url) {
+        throw new Error('repo.json exists but base_url is empty');
+      }
+      pathPrefix = repoData.base_url;
+    } catch (err) {
+      console.error('\n' + '=' * 60);
+      console.error('ERROR: Cannot determine path prefix.');
+      console.error('Run preprocessing first: python3 uu_framework/scripts/preprocess.py');
+      console.error('=' * 60 + '\n');
+      process.exit(1);
+    }
+  }
+
+  // Ensure trailing slash
+  if (!pathPrefix.endsWith('/')) {
+    pathPrefix += '/';
+  }
 
   return {
     dir: {

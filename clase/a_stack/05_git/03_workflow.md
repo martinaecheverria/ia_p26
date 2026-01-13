@@ -27,7 +27,7 @@ Puedes usarlo con tu LLM:
 ### Configuración Previa (Solo una vez)
 Si es la primera vez que haces esto, necesitas decirle a Git cuál es el repositorio del profesor.
 ```bash
-git remote add upstream git@github.com:sonder-art/ia_p26.git
+git remote add upstream git@github.com:{org}/{repo-name}.git
 ```
 Verifica que tengas `origin` (tu repo) y `upstream` (mi repo):
 ```bash
@@ -153,7 +153,7 @@ Aquí es donde oficialmente entregas tu tarea al profesor. Es como enviar el cor
 3.  **Configura la comparación (MUY IMPORTANTE):**
     Asegurate de que la flecha apunte hacia la izquierda (`base <- head`).
 
-    *   **Base repository:** `sonder-art/ia_p26` (Repo del profesor)
+    *   **Base repository:** `{org}/{repo-name}` (Repo del profesor)
     *   **Base branch:** `main`
     *   **Head repository:** `[tu-usuario]/[tu-fork]` (Tu repositorio)
     *   **Compare branch:** `[nombre-rama-tarea]` (La rama donde trabajaste)

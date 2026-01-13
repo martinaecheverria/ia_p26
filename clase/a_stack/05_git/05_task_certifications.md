@@ -32,7 +32,7 @@ Antes de empezar, abre tu LLM (Cursor, ChatGPT, Claude, Gemini, etc). Para que t
 ### 1. Preparación del Entorno (Fork & Clone)
 
 **Paso 0: Fork (Obligatorio)**
-Antes de tocar la terminal, ve a [https://github.com/sonder-art/ia_p26](https://github.com/sonder-art/ia_p26) y haz un **Fork** hacia tu cuenta personal.
+Antes de tocar la terminal, ve a [https://github.com/{org}/{repo-name}](https://github.com/{org}/{repo-name}) y haz un **Fork** hacia tu cuenta personal.
 
 Si aún no has clonado **TU FORK** y configurado el upstream, hazlo ahora (ver [02_repo_structure.md](./02_repo_structure.md)).
 
@@ -135,7 +135,7 @@ git push origin tarea-01-certificaciones
 ### 7. Crear el Pull Request (La Entrega)
 Ve a la página de **TU Fork** en GitHub y crea el Pull Request siguiendo las reglas de [03_workflow.md](./03_workflow.md).
 
-*   **Base repository:** `sonder-art/ia_p26` (main)
+*   **Base repository:** `{org}/{repo-name}` (main)
 *   **Head repository:** `tu-usuario/tu-fork` (tarea-01-certificaciones)
 *   **Título del PR:** `[Tarea 01] Tu Nombre - Certificaciones`
 *   **Descripción:**

@@ -106,7 +106,7 @@ permalink: /tareas/
 ---
 ```
 
-Esto crea la página en `/ia_p26/tareas/` en lugar de la ruta normal.
+Esto crea la página en `/{repo-name}/tareas/` en lugar de la ruta normal.
 
 ## Notas Importantes
 

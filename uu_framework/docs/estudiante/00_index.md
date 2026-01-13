@@ -8,7 +8,7 @@ Bienvenido al sitio web del curso de Inteligencia Artificial.
 
 ## Acceso al Sitio
 
-**URL:** https://sonder.art/ia_p26/
+**URL:** https://sonder.art/{repo-name}/
 
 ## Documentación
 

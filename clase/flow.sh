@@ -16,8 +16,26 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Variables de configuración
-UPSTREAM_URL="git@github.com:sonder-art/ia_p26.git"
+# Variables de configuración - Auto-detect from repo.json
+REPO_JSON="uu_framework/eleventy/_data/repo.json"
+
+# Try to read from repo.json if it exists
+if [ -f "$REPO_JSON" ]; then
+    # Extract upstream_url from JSON using grep/sed (no jq dependency)
+    UPSTREAM_URL=$(grep '"upstream_url"' "$REPO_JSON" | sed 's/.*"upstream_url": "\([^"]*\)".*/\1/')
+fi
+
+# Fallback to git remote if repo.json doesn't exist or is empty
+if [ -z "$UPSTREAM_URL" ]; then
+    UPSTREAM_URL=$(git config --get remote.origin.url)
+fi
+
+# Hard fail if still empty
+if [ -z "$UPSTREAM_URL" ]; then
+    echo -e "${RED}ERROR: Cannot determine upstream repository${NC}"
+    echo "Run: python3 uu_framework/scripts/preprocess.py"
+    exit 1
+fi
 
 # Función de ayuda
 show_help() {
@@ -153,7 +171,19 @@ cmd_upload() {
     
     echo -e "${GREEN}✓ Rama subida.${NC}"
     echo -e "${BLUE}Ahora ve a GitHub y crea el Pull Request:${NC}"
-    echo "https://github.com/sonder-art/ia_p26/compare"
+
+    # Try to read PR URL from repo.json
+    if [ -f "$REPO_JSON" ]; then
+        PR_URL=$(grep '"pr_compare_url"' "$REPO_JSON" | sed 's/.*"pr_compare_url": "\([^"]*\)".*/\1/')
+    fi
+
+    # Hard fail if empty
+    if [ -z "$PR_URL" ]; then
+        echo -e "${RED}ERROR: Cannot determine PR URL. Run preprocessing first.${NC}"
+        exit 1
+    fi
+
+    echo "$PR_URL"
 }
 
 # 6. TERMINAR (FINISH)

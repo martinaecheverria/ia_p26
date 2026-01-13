@@ -15,7 +15,7 @@ La documentación para estudiantes ahora está en:
 
 ## Acceso Rápido
 
-**URL del sitio:** https://sonder.art/ia_p26/
+**URL del sitio:** https://sonder.art/{repo-name}/
 
 ## Ayuda
 

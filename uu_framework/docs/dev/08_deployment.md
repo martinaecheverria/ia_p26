@@ -24,23 +24,23 @@ uu_framework sites deploy automatically to GitHub Pages at `www.sonder.art/{repo
 
 For custom domain `www.sonder.art`:
 
-1. Create `sonder-art.github.io` repository (if not exists)
+1. Create `{org}.github.io` repository (if not exists)
 2. Add `CNAME` file with `www.sonder.art`
 3. Configure DNS:
    - `A` records pointing to GitHub Pages IPs
-   - `CNAME` for `www` pointing to `sonder-art.github.io`
+   - `CNAME` for `www` pointing to `{org}.github.io`
 
 ## Creating a New Course Repo
 
-1. **Create repo** at `sonder-art/{course-name}`
+1. **Create repo** at `{org}/{course-name}`
 
 2. **Copy uu_framework structure**:
    ```
    {course-name}/
-   ├── .github/workflows/deploy.yaml  # Copy from ia_p26
+   ├── .github/workflows/deploy.yaml  # Copy from {repo-name}
    ├── clase/                         # Your course content
    ├── uu_framework/                  # Copy entire directory
-   └── .gitignore                     # Copy from ia_p26
+   └── .gitignore                     # Copy from {repo-name}
    ```
 
 3. **Update docker-compose.yaml** (for local dev):

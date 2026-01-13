@@ -5,7 +5,7 @@ Cómo ver y entregar las tareas del curso.
 ## Ver Lista de Tareas
 
 1. Haz clic en **"Tareas"** en la barra lateral
-2. O visita directamente: `/ia_p26/tareas/`
+2. O visita directamente: `/{repo-name}/tareas/`
 
 ### Información Mostrada
 

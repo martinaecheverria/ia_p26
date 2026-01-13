@@ -84,7 +84,7 @@ Complete data flow from markdown source to rendered HTML.
 ### Step 5: Output
 
 ```
-_site/ia_p26/a_stack/06_python/01_install_python/index.html
+_site/{repo-name}/a_stack/06_python/01_install_python/index.html
 ```
 
 ## Configuration
@@ -98,7 +98,7 @@ dir: {
   data: "../uu_framework/eleventy/_data",        // JSON data
   output: "_site"                              // Output HTML
 },
-pathPrefix: "/ia_p26/"  // GitHub Pages path
+pathPrefix: "/{repo-name}/"  // GitHub Pages path
 ```
 
 ### Content Collection
@@ -116,7 +116,7 @@ clase/a_stack/02_llms/01_concepts.md
     ↓ Remove clase/, .md
 /a_stack/02_llms/01_concepts/
     ↓ Add pathPrefix
-/ia_p26/a_stack/02_llms/01_concepts/
+/{repo-name}/a_stack/02_llms/01_concepts/
 ```
 
 ## Template Context

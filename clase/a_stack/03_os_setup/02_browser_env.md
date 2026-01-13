@@ -188,9 +188,9 @@ Un **workspace** es tu entorno de desarrollo en la nube.
 Esta es la forma más sencilla para estudiantes:
 
 1. Buscar la URL del repositorio en GitHub, por ejemplo:  
-   `https://github.com/sonder-art/ia_p26`
+   `https://github.com/{org}/{repo-name}`
 2. Agregar delante `https://gitpod.io/#` (siguen funcionando los enlaces legacy de Gitpod en Ona), por ejemplo:  
-   `https://gitpod.io/#https://github.com/sonder-art/ia_p26`
+   `https://gitpod.io/#https://github.com/{org}/{repo-name}`
 3. Pegar esa URL en el navegador y presionar Enter.
 4. Esto abrirá Ona/Gitpod y creará automáticamente un workspace para ese repo.
 
@@ -304,7 +304,7 @@ El profesor puede preparar este archivo una vez, y los estudiantes solo dan clic
    - Ir a [ona.com](https://ona.com), entrar con GitHub.
 
 5. **Usar Ona/Gitpod**:  
-   - Entrar a `https://gitpod.io/#https://github.com/sonder-art/ia_p26`  
+   - Entrar a `https://gitpod.io/#https://github.com/{org}/{repo-name}`  
    - Esperar que se cree el workspace.  
    - Programar desde el navegador (VS Code-like online).
 

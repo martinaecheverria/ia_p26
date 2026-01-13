@@ -5,10 +5,17 @@
 site:
   name: "Inteligencia Artificial - ITAM"
   description: "Primavera 2026"
-  base_url: "/ia_p26"              # /{repo-name} - used for GitHub Pages
+  base_url: "/ia_p26"              # DEPRECATED: auto-detected from repository config
   domain: "sonder.art"
   language: "es"
   author: "ITAM"
+
+# Repository configuration (auto-detected from git remote if not specified)
+# Leave values empty for automatic detection
+repository:
+  name: "ia_p26"                   # Repository name (e.g., "ia_p26")
+  org: "sonder-art"                # GitHub organization/user (e.g., "sonder-art")
+  upstream_url: "git@github.com:sonder-art/ia_p26.git"  # Full git URL
 
 # Source configuration
 source:

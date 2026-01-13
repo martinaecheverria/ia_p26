@@ -17,21 +17,21 @@ eleventyExcludeFromCollections: true
 
 ![Landing Page]({{ '/images/landing_page.png' | url }})
 
-Bienvenido al curso de Inteligencia Artificial.
+Bienvenidx al curso de Inteligencia Artificial.
 
 ## Enlaces
 
 - **Sitio web**: [www.sonder.art/ia_p26](https://www.sonder.art/ia_p26/)
-- **Introducción**: [Ver contenido]({{ \'/01_introduccion/00_index/\' | url }})
-- **Presentación**: [Google Drive](https://docs.google.com/presentation/d/1HKFdjhDmgI0wURvAqAiysOKaxxeNnWiaRO1iYHYt0dc/edit?usp=sharing)
+- **Introducción**: [Ver contenido]({{ '/01_introduccion/00_index/' | url }})
+- **Presentación**: [Google Drive]({{ '/d/1HKFdjhDmgI0wURvAqAiysOKaxxeNnWiaRO1iYHYt0dc/edit?usp=sharing' | url }})
 
 ### Recursos del Curso
 
 | Recurso | Enlace |
 |---------|--------|
-| **Materiales del curso** | [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1H0_U6qNYaStiqhkPvWgs6FuGChT-d39_?usp=drive_link) |
-| **Inteligencia Artificial (COM-23101-002)** | [![Canvas](https://img.shields.io/badge/Canvas-E72429?style=for-the-badge&logo=canvas&logoColor=white)](https://itam.instructure.com/courses/16381) |
-| **Intro a IA (COM-11308-002)** | [![Canvas](https://img.shields.io/badge/Canvas-E72429?style=for-the-badge&logo=canvas&logoColor=white)](https://itam.instructure.com/courses/16573) |
+| **Materiales del curso** | [![Google Drive]({{ '/Google%20Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white' | url }})](https://drive.google.com/drive/folders/1H0_U6qNYaStiqhkPvWgs6FuGChT-d39_?usp=drive_link) |
+| **Inteligencia Artificial (COM-23101-002)** | [![Canvas]({{ '/Canvas-E72429?style=for-the-badge&logo=canvas&logoColor=white' | url }})](https://itam.instructure.com/courses/16381) |
+| **Intro a IA (COM-11308-002)** | [![Canvas]({{ '/Canvas-E72429?style=for-the-badge&logo=canvas&logoColor=white' | url }})](https://itam.instructure.com/courses/16573) |
 
 ## Desarrollo Local
 
@@ -39,7 +39,10 @@ Bienvenido al curso de Inteligencia Artificial.
 # Iniciar servidor de desarrollo
 docker compose -f uu_framework/docker/docker-compose.yaml up dev
 
-# Visitar: http://localhost:3000/ia_p26/
+# Visitar: http://localhost:3000/{repo-name}/ (e.g., http://localhost:3000/ia_p26/)
 ```
 
 Ver documentación completa en `uu_framework/docs/`
+
+## Contacto
+mario.vazquez.corte@itam.mx

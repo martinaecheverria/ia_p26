@@ -9,10 +9,10 @@ A static site generator for ITAM course materials, built on Eleventy with Python
 ## Quick Start
 
 ```bash
-# Start dev server
+# Start dev server (auto-detects repo from git remote)
 docker compose -f uu_framework/docker/docker-compose.yaml up dev
 
-# Visit http://localhost:3000/ia_p26/
+# Visit http://localhost:3000/{repo-name}/ (e.g., /ia_p26/)
 ```
 
 ## Architecture Overview

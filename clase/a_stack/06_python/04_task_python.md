@@ -73,7 +73,7 @@ Nuevamente, deja que Cursor te ayude.
 2.  Commit: `git commit -m "Agrego mi primer script de python"`
 3.  Push: `git push origin tarea-02-python`
 
-4.  Ve a GitHub y crea el Pull Request hacia `sonder-art/ia_p26`.
+4.  Ve a GitHub y crea el Pull Request hacia `{org}/{repo-name}`.
 
 > **Recuerda:** Puedes pedirle ayuda a tu agente de IA: *"Ayúdame a subir mis cambios usando el script flow.sh, estoy en la rama tarea-02-python"*.
 

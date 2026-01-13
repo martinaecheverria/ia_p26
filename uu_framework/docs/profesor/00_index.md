@@ -48,7 +48,7 @@ Más contenido...
 docker compose -f uu_framework/docker/docker-compose.yaml up dev
 
 # URL local
-http://localhost:3000/ia_p26/
+http://localhost:3000/{repo-name}/
 ```
 
 ## Archivos Clave

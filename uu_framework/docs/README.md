@@ -87,7 +87,7 @@ docker compose -f uu_framework/docker/docker-compose.yaml run build
 
 ```bash
 docker compose -f uu_framework/docker/docker-compose.yaml up dev
-# Visit http://localhost:3000/ia_p26/
+# Visit http://localhost:3000/{repo-name}/
 ```
 
 ## Without Docker
