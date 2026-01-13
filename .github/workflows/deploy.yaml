@@ -70,6 +70,21 @@ jobs:
         run: |
           cp clase/favicon.ico clase/apple-touch-icon.png _site/ 2>/dev/null || true
 
+      - name: Copy PDF files
+        run: |
+          # Copy PDFs from numbered directories (01_, 02_, etc.)
+          find clase -path "clase/0*/**/*.pdf" -o -path "clase/a_stack/**/*.pdf" | while read pdf; do
+            # Get relative path from clase/
+            rel_path="${pdf#clase/}"
+            # Get directory
+            pdf_dir=$(dirname "$rel_path")
+            # Create directory in _site
+            mkdir -p "_site/$pdf_dir"
+            # Copy PDF
+            cp "$pdf" "_site/$rel_path"
+            echo "Copied: $rel_path"
+          done
+
       - name: Create .nojekyll file
         run: |
           touch _site/.nojekyll
