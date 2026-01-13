@@ -72,8 +72,8 @@ jobs:
 
       - name: Copy PDF files
         run: |
-          # Copy PDFs from numbered directories (01_, 02_, etc.)
-          find clase -path "clase/0*/**/*.pdf" -o -path "clase/a_stack/**/*.pdf" | while read pdf; do
+          # Copy all PDFs except those in b_libros (gitignored)
+          find clase -name "*.pdf" | grep -v "b_libros" | while read pdf; do
             # Get relative path from clase/
             rel_path="${pdf#clase/}"
             # Get directory
