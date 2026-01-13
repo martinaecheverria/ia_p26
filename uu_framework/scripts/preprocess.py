@@ -273,12 +273,21 @@ eleventyExcludeFromCollections: true
             "![Landing Page]({{ '/images/landing_page.png' | url }})"
         )
 
-        # Convert absolute links to use url filter (generic for any domain/repo)
-        web_content = re.sub(
-            r'\[([^\]]+)\]\(https://(?:www\.)?([^/]+)/([^/]+)/([^\)]+)\)',
-            r"[\1]({{ '/\4' | url }})",
-            web_content
-        )
+        # Get domain and repo name from config for URL conversion
+        domain = config.get('site', {}).get('domain', 'sonder.art')
+        repo_name = config.get('repository', {}).get('name', '')
+
+        # Only convert URLs pointing to OUR site (domain/repo_name/...)
+        # This preserves external URLs like shields.io badges, drive.google.com, etc.
+        if repo_name:
+            # Match: [text](https://www.sonder.art/repo_name/path) or [text](https://sonder.art/repo_name/path)
+            # Convert to: [text]({{ '/path' | url }})
+            pattern = rf'\[([^\]]+)\]\(https://(?:www\.)?{re.escape(domain)}/{re.escape(repo_name)}/([^\)]*)\)'
+            web_content = re.sub(pattern, r"[\1]({{ '/\2' | url }})", web_content)
+
+            # Also handle the site root: [text](https://www.sonder.art/repo_name/)
+            pattern_root = rf'\[([^\]]+)\]\(https://(?:www\.)?{re.escape(domain)}/{re.escape(repo_name)}/?\)'
+            web_content = re.sub(pattern_root, r"[\1]({{ '/' | url }})", web_content)
 
         # Write to clase/README.md
         with open(clase_readme, 'w', encoding='utf-8') as f:

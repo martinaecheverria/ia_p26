@@ -69,8 +69,9 @@ module.exports = function(eleventyConfig) {
   // Copy fonts
   eleventyConfig.addPassthroughCopy({ "../uu_framework/eleventy/src/fonts": "fonts" });
 
-  // Copy images from content (explicitly from images directory only)
-  eleventyConfig.addPassthroughCopy("images/**/*.{png,jpg,jpeg,gif,svg,webp}");
+  // Copy images from content directory
+  // Using object form to ensure proper path mapping
+  eleventyConfig.addPassthroughCopy({ "images": "images" });
 
   // Copy PDF files from content directories (exclude b_libros which is gitignored)
   // Match all PDFs in numbered directories (01_, 02_, 03_, etc.)

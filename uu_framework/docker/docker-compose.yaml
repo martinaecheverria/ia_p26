@@ -19,7 +19,7 @@ services:
       - ../../uu_framework/eleventy/.eleventy.js:/app/uu_framework/eleventy/.eleventy.js:ro
       - ../../uu_framework/eleventy/tailwind.config.js:/app/uu_framework/eleventy/tailwind.config.js:ro
       - ../../uu_framework/eleventy/src:/app/uu_framework/eleventy/src:ro
-    command: ["sh", "-c", "python3 uu_framework/scripts/preprocess.py && npx @11ty/eleventy --config=uu_framework/eleventy/.eleventy.js && mkdir -p _site/css/themes && npx tailwindcss -c uu_framework/eleventy/tailwind.config.js -i uu_framework/eleventy/src/css/main.css -o _site/css/styles.css --minify && cp uu_framework/eleventy/src/css/themes/*.css _site/css/themes/ && cp clase/favicon.ico clase/apple-touch-icon.png _site/ 2>/dev/null || true && find clase -name '*.pdf' | grep -v b_libros | while read pdf; do rel_path=$${pdf#clase/}; pdf_dir=$$(dirname $$rel_path); mkdir -p _site/$$pdf_dir; cp $$pdf _site/$$rel_path; done && touch _site/.nojekyll"]
+    command: ["sh", "-c", "python3 uu_framework/scripts/preprocess.py && npx @11ty/eleventy --config=uu_framework/eleventy/.eleventy.js && mkdir -p _site/css/themes && npx tailwindcss -c uu_framework/eleventy/tailwind.config.js -i uu_framework/eleventy/src/css/main.css -o _site/css/styles.css --minify && cp uu_framework/eleventy/src/css/themes/*.css _site/css/themes/ && cp clase/favicon.ico clase/apple-touch-icon.png _site/ 2>/dev/null || true && if [ -d clase/images ]; then mkdir -p _site/images && cp -r clase/images/* _site/images/; fi && find clase -name '*.pdf' | grep -v b_libros | while read pdf; do rel_path=$${pdf#clase/}; pdf_dir=$$(dirname $$rel_path); mkdir -p _site/$$pdf_dir; cp $$pdf _site/$$rel_path; done && touch _site/.nojekyll"]
 
   # Development server with hot reload
   dev:
@@ -50,6 +50,7 @@ services:
              npx tailwindcss -c uu_framework/eleventy/tailwind.config.js -i uu_framework/eleventy/src/css/main.css -o _site/css/styles.css &&
              cp uu_framework/eleventy/src/css/themes/*.css _site/css/themes/ &&
              cp clase/favicon.ico clase/apple-touch-icon.png _site/ 2>/dev/null || true &&
+             if [ -d clase/images ]; then mkdir -p _site/images && cp -r clase/images/* _site/images/; fi &&
              find clase -name '*.pdf' | grep -v b_libros | while read pdf; do rel_path=$${pdf#clase/}; pdf_dir=$$(dirname $$rel_path); mkdir -p _site/$$pdf_dir; cp $$pdf _site/$$rel_path; done &&
              touch _site/.nojekyll &&
              npx @11ty/eleventy --config=uu_framework/eleventy/.eleventy.js --serve --port=3000"

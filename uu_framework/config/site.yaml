@@ -25,6 +25,7 @@ source:
     - "README_FLOW.md"
     - "README.md"                  # Landing page (excluded from nav)
     - "b_libros"                   # PDFs not rendered as pages
+    - "images"                     # Static images (not content)
 
 # Theme configuration
 theme:
