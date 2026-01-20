@@ -4,30 +4,69 @@ title: "Satisfacibilidad y SAT"
 
 # Satisfacibilidad y SAT
 
-El problema computacional central de la lógica.
+El problema computacional en el corazón de la lógica.
 
-## Satisfacibilidad, Validez y Conceptos Relacionados
+## Introducción: Las Preguntas Fundamentales
 
-### Definiciones
+Hasta ahora hemos aprendido a representar conocimiento (sintaxis) y a determinar cuándo es verdadero (semántica). Pero hay preguntas importantes que aún no hemos respondido:
 
-| Concepto | Definición | Ejemplo |
-|----------|------------|---------|
-| **Satisfacible** | Verdadera en **algún** modelo | $P \land Q$ |
-| **Insatisfacible** | Falsa en **todos** los modelos | $P \land \neg P$ |
-| **Válida (Tautología)** | Verdadera en **todos** los modelos | $P \lor \neg P$ |
-| **Contingente** | Satisfacible pero no válida | $P$ |
+- ¿Existe alguna situación donde mi fórmula sea verdadera?
+- ¿Es mi fórmula siempre verdadera?
+- ¿Mi fórmula es una contradicción?
 
-### Relaciones
+Estas preguntas tienen nombres técnicos y están profundamente relacionadas entre sí.
+
+---
+
+## Clasificación de Fórmulas
+
+Toda fórmula proposicional cae en exactamente una de tres categorías:
+
+### Satisfacible
+
+Una fórmula es **satisfacible** si existe **al menos un modelo** donde es verdadera.
+
+**Ejemplo:** $P \land Q$ es satisfacible.
+
+¿Por qué? Porque en el modelo $\{P=T, Q=T\}$, la fórmula es verdadera.
+
+No importa que sea falsa en otros modelos (como $\{P=T, Q=F\}$). Solo necesitamos **un** modelo que la haga verdadera.
+
+### Insatisfacible (Contradicción)
+
+Una fórmula es **insatisfacible** si es falsa en **todos** los modelos posibles.
+
+**Ejemplo:** $P \land \neg P$ es insatisfacible.
+
+No importa qué valor tenga P:
+- Si P=T: T ∧ F = F
+- Si P=F: F ∧ T = F
+
+No existe ningún modelo que la haga verdadera. Es una **contradicción**.
+
+### Válida (Tautología)
+
+Una fórmula es **válida** (o una **tautología**) si es verdadera en **todos** los modelos posibles.
+
+**Ejemplo:** $P \lor \neg P$ es válida.
+
+No importa qué valor tenga P:
+- Si P=T: T ∨ F = T
+- Si P=F: F ∨ T = T
+
+Siempre es verdadera. Es una **ley lógica**.
+
+### Resumen Visual
 
 ```mermaid
 graph TD
-    subgraph "Todas las fórmulas"
-        V[Válidas/Tautologías]
-        C[Contingentes]
-        I[Insatisfacibles]
+    subgraph "Todas las Fórmulas"
+        V[Válidas<br/>siempre verdaderas]
+        C[Contingentes<br/>a veces verdaderas]
+        I[Insatisfacibles<br/>nunca verdaderas]
     end
     
-    V --> S[Satisfacibles]
+    V --> S[Satisfacibles<br/>alguna vez verdaderas]
     C --> S
     
     style V fill:#059669,stroke:#047857,color:#fff
@@ -36,233 +75,240 @@ graph TD
     style S fill:#8b5cf6,stroke:#7c3aed,color:#fff
 ```
 
+- **Satisfacibles** = Válidas + Contingentes (todo lo que no es contradicción)
+- **Contingentes** = Satisfacibles pero no válidas (depende del modelo)
+
+### Ejemplos Clasificados
+
+| Fórmula | Satisfacible | Válida | Insatisfacible | Tipo |
+|---------|:------------:|:------:|:--------------:|------|
+| $P$ | ✓ | — | — | Contingente |
+| $P \land Q$ | ✓ | — | — | Contingente |
+| $P \lor \neg P$ | ✓ | ✓ | — | Tautología |
+| $P \rightarrow P$ | ✓ | ✓ | — | Tautología |
+| $(P \rightarrow Q) \lor (Q \rightarrow P)$ | ✓ | ✓ | — | Tautología |
+| $P \land \neg P$ | — | — | ✓ | Contradicción |
+| $(P \rightarrow Q) \land P \land \neg Q$ | — | — | ✓ | Contradicción |
+
+---
+
+## Relaciones Importantes
+
+Estas clasificaciones están relacionadas de formas útiles:
+
+### Relación entre Validez e Insatisfacibilidad
+
+$$\alpha \text{ es válida} \iff \neg\alpha \text{ es insatisfacible}$$
+
+**Intuición:** Si $\alpha$ es siempre verdadera, entonces $\neg\alpha$ es siempre falsa.
+
+**Uso práctico:** Para verificar si $\alpha$ es una tautología, podemos verificar si $\neg\alpha$ es insatisfacible.
+
 ### Relación con Entailment
 
 $$\alpha \models \beta \iff (\alpha \land \neg\beta) \text{ es insatisfacible}$$
 
-$$\alpha \text{ es válida} \iff \neg\alpha \text{ es insatisfacible}$$
+**Intuición:** "$\alpha$ implica $\beta$" significa que no puede pasar que $\alpha$ sea verdadera y $\beta$ sea falsa.
 
-:::example{title="Clasificación de Fórmulas"}
-
-| Fórmula | Satisfacible | Válida | Insatisfacible |
-|---------|:------------:|:------:|:--------------:|
-| $P \land \neg P$ | ✗ | ✗ | ✓ |
-| $P \lor \neg P$ | ✓ | ✓ | ✗ |
-| $P \rightarrow P$ | ✓ | ✓ | ✗ |
-| $P$ | ✓ | ✗ | ✗ |
-| $P \land Q$ | ✓ | ✗ | ✗ |
-
-:::
+**Uso práctico:** Esta es la base de la refutación por resolución que vimos en la sección anterior.
 
 ---
 
 ## El Problema SAT
 
-**SAT** (Boolean Satisfiability Problem):
+El problema **SAT** (Boolean Satisfiability Problem) es:
 
-> Dada una fórmula proposicional $\phi$, ¿existe una asignación de valores de verdad que haga $\phi$ verdadera?
-
-### Entrada y Salida
-
-- **Entrada:** Fórmula en CNF
-- **Salida:** 
-  - "SATISFACIBLE" + modelo que satisface, o
-  - "INSATISFACIBLE"
+> **Entrada:** Una fórmula proposicional $\phi$ (usualmente en CNF)
+> 
+> **Pregunta:** ¿Es $\phi$ satisfacible?
+> 
+> **Salida:** "SÍ" + un modelo que la satisface, o "NO"
 
 ### Ejemplo
 
 **Entrada:** $(P \lor Q) \land (\neg P \lor R) \land (\neg Q \lor \neg R)$
 
-**Proceso:** Buscar asignación...
+**Proceso:** Buscar una asignación que haga todas las cláusulas verdaderas...
 
-**Salida:** SATISFACIBLE, modelo: $\{P=T, Q=F, R=T\}$
+**Salida:** SÍ, satisfacible. Modelo: $\{P=T, Q=F, R=T\}$
 
-Verificación:
+**Verificación:**
 - $(T \lor F) = T$ ✓
 - $(F \lor T) = T$ ✓
 - $(T \lor F) = T$ ✓
+
+Todas las cláusulas son verdaderas, por lo tanto la fórmula es satisfacible.
 
 ---
 
 ## SAT es NP-Completo
 
-### Teorema de Cook-Levin (1971)
+### ¿Qué Significa NP-Completo?
 
-> SAT es **NP-completo**.
+En teoría de la complejidad, los problemas se clasifican por qué tan difíciles son de resolver:
+
+- **P**: Problemas que se pueden **resolver** en tiempo polinomial (eficientemente)
+- **NP**: Problemas cuyas soluciones se pueden **verificar** en tiempo polinomial
+- **NP-completo**: Los problemas más difíciles en NP
+
+### El Teorema de Cook-Levin (1971)
+
+> **Teorema:** SAT es **NP-completo**.
 
 Esto significa:
-1. SAT está en NP (se puede verificar una solución en tiempo polinomial)
-2. Todo problema en NP se puede reducir a SAT en tiempo polinomial
+1. SAT está en NP (dada una asignación, podemos verificar en tiempo polinomial si satisface la fórmula)
+2. Cualquier problema en NP se puede reducir a SAT (SAT es al menos tan difícil como cualquier otro problema en NP)
 
-### Implicaciones
+### ¿Por Qué Importa?
 
-| Si... | Entonces... |
-|-------|-------------|
-| P = NP | SAT tiene algoritmo polinomial |
-| P ≠ NP | SAT no tiene algoritmo polinomial |
+Si alguien encontrara un algoritmo polinomial para SAT, podría resolver **todos** los problemas en NP eficientemente. Esto implicaría P = NP.
 
-**Estado actual:** No sabemos si P = NP (problema del millón de dólares).
+Actualmente, la mayoría de los expertos creen que P ≠ NP, lo que significa que SAT probablemente no tiene solución polinomial.
 
-### ¿Qué tan difícil es NP-completo?
+### El Problema del Crecimiento Exponencial
 
-| Símbolos | Modelos posibles | Tiempo (1M modelos/seg) |
-|----------|------------------|-------------------------|
-| 10 | ~1,000 | < 1 ms |
+El enfoque ingenuo de "probar todas las asignaciones" tiene complejidad $O(2^n)$:
+
+| Variables | Modelos | Tiempo (1M modelos/seg) |
+|:---------:|:-------:|:-----------------------:|
+| 10 | ~1,000 | 0.001 segundos |
 | 20 | ~1,000,000 | 1 segundo |
 | 30 | ~1,000,000,000 | 17 minutos |
 | 40 | ~1 billón | 12 días |
-| 50 | ~1,000 billones | 35 años |
-| 100 | ~10^30 | edad del universo × 10^12 |
+| 50 | ~10^15 | 35 años |
+| 100 | ~10^30 | más que la edad del universo |
+
+¡El crecimiento exponencial es devastador!
 
 ---
 
 ## Algoritmos para SAT
 
-### 1. Fuerza Bruta
+A pesar de que SAT es NP-completo (y probablemente no tiene solución polinomial en el peor caso), hay algoritmos que funcionan bien en la práctica.
 
-```python
-def brute_force_sat(formula, symbols):
-    """
-    Prueba todas las 2^n asignaciones.
-    """
-    if not symbols:
-        return evaluate(formula, {})
-    
-    p = symbols[0]
-    rest = symbols[1:]
-    
-    # Probar p = True
-    if brute_force_sat(formula.substitute(p, True), rest):
-        return True
-    # Probar p = False
-    if brute_force_sat(formula.substitute(p, False), rest):
-        return True
-    
-    return False
-```
+### DPLL: El Algoritmo Clásico
 
-**Complejidad:** $O(2^n)$ — impracticable para n > 30.
+**DPLL** (Davis-Putnam-Logemann-Loveland, 1962) mejora la búsqueda exhaustiva con tres ideas:
 
-### 2. DPLL (Davis-Putnam-Logemann-Loveland)
+#### 1. Propagación de Unidad (Unit Propagation)
 
-Mejora sobre fuerza bruta con tres optimizaciones:
-
-#### Propagación de Unidad (Unit Propagation)
-
-Si una cláusula tiene un solo literal sin asignar, ese literal **debe** ser verdadero.
+Si una cláusula tiene **un solo literal sin asignar**, ese literal **debe** ser verdadero para satisfacer la cláusula.
 
 **Ejemplo:**
 - Cláusulas: $(P)$, $(\neg P \lor Q)$, $(R \lor \neg Q)$
-- $(P)$ es unitaria → $P = True$
-- Propagando: $(\neg P \lor Q)$ → $(Q)$ es unitaria → $Q = True$
-- Propagando: $(R \lor \neg Q)$ → $(R)$... y así sucesivamente
+- $(P)$ es **unitaria** → asignamos $P = T$
+- Simplificando: $(\neg P \lor Q)$ se convierte en $(Q)$ → también unitaria → $Q = T$
+- Simplificando: $(R \lor \neg Q)$ se convierte en $(R)$ → $R = T$
 
-#### Eliminación de Literales Puros
+Esta propagación en cascada puede resolver muchas variables sin backtracking.
 
-Si un literal aparece solo en una polaridad (solo positivo o solo negativo), asignarlo para satisfacer todas sus cláusulas.
+#### 2. Eliminación de Literales Puros
 
-**Ejemplo:**
-- Si $R$ aparece solo como $R$ (nunca $\neg R$), asignar $R = True$
+Un literal es **puro** si solo aparece en una polaridad (siempre positivo o siempre negativo).
 
-#### Early Termination
+**Ejemplo:** Si $R$ aparece en varias cláusulas pero $\neg R$ nunca aparece, podemos asignar $R = T$ sin afectar negativamente ninguna cláusula.
 
-- Si todas las cláusulas son verdaderas → SATISFACIBLE
-- Si alguna cláusula es vacía (todos sus literales falsos) → INSATISFACIBLE en esta rama
+#### 3. Terminación Temprana
 
-```python
-def dpll(clauses, symbols, model):
-    """
-    Algoritmo DPLL para SAT.
-    """
-    # Early termination
-    if all(is_true(c, model) for c in clauses):
-        return True, model
-    if any(is_false(c, model) for c in clauses):
-        return False, None
+- Si todas las cláusulas están satisfechas → **SAT**
+- Si alguna cláusula está vacía (todos sus literales son falsos) → **UNSAT** en esta rama
+
+### Pseudocódigo DPLL
+
+```
+función DPLL(cláusulas, asignación):
+    # Terminación temprana
+    si todas las cláusulas son verdaderas:
+        retornar SAT
+    si alguna cláusula es falsa:
+        retornar UNSAT
     
-    # Unit propagation
-    unit = find_unit_clause(clauses, model)
-    if unit:
-        return dpll(clauses, symbols - {unit.var}, 
-                    {**model, unit.var: unit.sign})
+    # Propagación de unidad
+    mientras exista cláusula unitaria (l):
+        asignación ← asignación ∪ {l = verdadero}
+        simplificar cláusulas
     
-    # Pure literal
-    pure = find_pure_literal(clauses, model)
-    if pure:
-        return dpll(clauses, symbols - {pure.var},
-                    {**model, pure.var: pure.sign})
+    # Eliminación de literal puro
+    mientras exista literal puro l:
+        asignación ← asignación ∪ {l = verdadero}
+        simplificar cláusulas
     
-    # Branching
-    p = choose_symbol(symbols)
-    rest = symbols - {p}
-    
-    result, m = dpll(clauses, rest, {**model, p: True})
-    if result:
-        return True, m
-    
-    return dpll(clauses, rest, {**model, p: False})
+    # Ramificación (branching)
+    elegir variable P no asignada
+    si DPLL(cláusulas, asignación ∪ {P = T}) = SAT:
+        retornar SAT
+    retornar DPLL(cláusulas, asignación ∪ {P = F})
 ```
 
-### 3. CDCL (Conflict-Driven Clause Learning)
+### SAT Solvers Modernos: CDCL
 
-Los SAT solvers modernos usan CDCL, que extiende DPLL con:
+Los SAT solvers de hoy usan **CDCL** (Conflict-Driven Clause Learning), que extiende DPLL con:
 
 | Técnica | Descripción |
 |---------|-------------|
-| **Clause Learning** | Cuando hay conflicto, aprender nueva cláusula que evita el mismo conflicto |
-| **Non-chronological Backtracking** | Retroceder más de un nivel cuando se aprende |
-| **Watched Literals** | Detectar cláusulas unitarias eficientemente |
-| **Restarts** | Reiniciar búsqueda periódicamente, conservando cláusulas aprendidas |
-| **Heurísticas de decisión** | VSIDS, etc. para elegir qué variable asignar |
+| **Clause Learning** | Cuando hay conflicto, analizar la causa y aprender una nueva cláusula que evite repetir el mismo error |
+| **Non-chronological Backtracking** | En lugar de retroceder un nivel, saltar directamente al nivel que causó el conflicto |
+| **Restarts** | Reiniciar la búsqueda periódicamente, conservando las cláusulas aprendidas |
+| **Heurísticas de decisión** | Elegir inteligentemente qué variable asignar (ej: VSIDS) |
 
-### Rendimiento Real
+### El Éxito Práctico de SAT
 
-A pesar de ser NP-completo, los SAT solvers modernos resuelven instancias con **millones de variables** en segundos.
+Aunque SAT es NP-completo en teoría, los SAT solvers modernos resuelven instancias con **millones de variables** en segundos.
 
 ![Performance de SAT solvers en competiciones]({{ '/03_logica/images/sat_solver_performance.png' | url }})
 
-| SAT Solver | Año | Variables resueltas |
-|------------|-----|---------------------|
+| SAT Solver | Año | Variables típicas resueltas |
+|------------|:---:|:---------------------------:|
 | GRASP | 1996 | ~1,000 |
 | Chaff | 2001 | ~100,000 |
 | MiniSat | 2003 | ~500,000 |
 | CryptoMiniSat | 2009 | ~1,000,000+ |
 | Kissat | 2020 | 10,000,000+ |
 
+**¿Por qué funciona en la práctica?**
+
+Las instancias del "mundo real" usualmente no son los peores casos. Tienen estructura que los solvers pueden explotar:
+- Muchas cláusulas se simplifican rápidamente
+- Las cláusulas aprendidas evitan explorar regiones inútiles
+- Las heurísticas guían hacia soluciones rápidamente
+
 ---
 
-## Casos Especiales Eficientes
+## Casos Especiales: Cuando SAT es Fácil
 
-### 2-SAT
+No todas las restricciones sobre SAT lo mantienen difícil:
 
-Si todas las cláusulas tienen **a lo más 2 literales**:
-- **2-SAT ∈ P** — ¡resoluble en tiempo lineal!
-- Algoritmo: Construir grafo de implicaciones, buscar componentes fuertemente conexos
+### 2-SAT: Tiempo Lineal
 
-### Horn-SAT
+Si cada cláusula tiene **a lo más 2 literales**, el problema está en P.
 
-Si todas las cláusulas son **cláusulas de Horn**:
-- **Horn-SAT ∈ P** — resoluble en tiempo lineal
-- Algoritmo: Forward chaining
+**Ejemplo de 2-SAT:** $(P \lor Q) \land (\neg P \lor R) \land (\neg Q \lor \neg R)$
 
-### XOR-SAT
+**Algoritmo:** Construir un grafo de implicaciones y buscar componentes fuertemente conexos. Complejidad: $O(n)$.
 
-Conjunción de cláusulas XOR:
-- **XOR-SAT ∈ P** — eliminación Gaussiana
+### Horn-SAT: Tiempo Lineal
+
+Si todas las cláusulas son **cláusulas de Horn** (a lo más un literal positivo), el problema está en P.
+
+**Algoritmo:** Forward chaining. Complejidad: $O(n)$.
+
+### k-SAT para k ≥ 3: NP-Completo
+
+Para cláusulas con 3 o más literales, el problema es NP-completo.
+
+**La frontera:** 2-SAT es fácil, 3-SAT es difícil. ¡Un literal de diferencia!
 
 ```mermaid
 graph TD
-    SAT[SAT<br/>NP-completo]
+    SAT[SAT General<br/>NP-completo]
     
-    SAT --> |"≤2 literales"| TWO[2-SAT<br/>P]
-    SAT --> |"Horn"| HORN[Horn-SAT<br/>P]
-    SAT --> |"XOR"| XOR[XOR-SAT<br/>P]
-    SAT --> |"≥3 literales"| THREE[3-SAT<br/>NP-completo]
+    SAT --> |"≤ 2 literales/cláusula"| TWO[2-SAT<br/>P - Tiempo lineal]
+    SAT --> |"Cláusulas de Horn"| HORN[Horn-SAT<br/>P - Tiempo lineal]
+    SAT --> |"≥ 3 literales/cláusula"| THREE[3-SAT<br/>NP-completo]
     
     style SAT fill:#f59e0b,stroke:#d97706,color:#000
     style TWO fill:#059669,stroke:#047857,color:#fff
     style HORN fill:#059669,stroke:#047857,color:#fff
-    style XOR fill:#059669,stroke:#047857,color:#fff
     style THREE fill:#dc2626,stroke:#b91c1c,color:#fff
 ```
 
@@ -270,154 +316,127 @@ graph TD
 
 ## Aplicaciones de SAT
 
-SAT solvers se usan en muchas áreas:
+Los SAT solvers se usan en muchas áreas:
 
-| Área | Aplicación |
-|------|------------|
-| **Hardware** | Verificación de circuitos, equivalencia de diseños |
-| **Software** | Model checking, bug finding |
-| **Seguridad** | Análisis de protocolos, criptoanálisis |
+| Dominio | Aplicación |
+|---------|------------|
+| **Verificación de hardware** | Comprobar que circuitos cumplen especificaciones |
+| **Verificación de software** | Model checking, encontrar bugs |
 | **Planificación** | Planning as satisfiability |
+| **Criptografía** | Análisis de protocolos, criptoanálisis |
 | **Bioinformática** | Haplotyping, análisis de redes |
-| **Scheduling** | Asignación de recursos, timetabling |
-| **Sudoku** | ¡Resolver Sudoku como SAT! |
+| **Scheduling** | Asignación de horarios, recursos |
+| **Juegos/Puzzles** | Sudoku, N-reinas, etc. |
 
 :::example{title="Sudoku como SAT"}
 
-Variables: $x_{r,c,v}$ = "celda (r,c) tiene valor v"
+Un Sudoku 9×9 se puede codificar como SAT:
 
-Restricciones (cláusulas):
-1. Cada celda tiene al menos un valor: $x_{r,c,1} \lor x_{r,c,2} \lor \cdots \lor x_{r,c,9}$
-2. Cada celda tiene a lo más un valor: $\neg x_{r,c,i} \lor \neg x_{r,c,j}$ para $i \neq j$
-3. Cada fila tiene cada número: ...
-4. Cada columna tiene cada número: ...
-5. Cada caja 3×3 tiene cada número: ...
-6. Celdas pre-llenadas: $x_{r,c,v}$ (cláusulas unitarias)
+**Variables:** $x_{r,c,v}$ = "la celda (fila r, columna c) tiene el valor v"
+- 9 filas × 9 columnas × 9 valores = 729 variables
 
-¡Un SAT solver resuelve cualquier Sudoku en milisegundos!
+**Restricciones (todas como cláusulas):**
+
+1. **Cada celda tiene al menos un valor:**
+   - Para cada (r,c): $x_{r,c,1} \lor x_{r,c,2} \lor \cdots \lor x_{r,c,9}$
+
+2. **Cada celda tiene a lo más un valor:**
+   - Para cada (r,c) y par de valores diferentes i,j: $\neg x_{r,c,i} \lor \neg x_{r,c,j}$
+
+3. **Cada fila tiene todos los números:** 9 cláusulas por número
+
+4. **Cada columna tiene todos los números:** 9 cláusulas por número
+
+5. **Cada caja 3×3 tiene todos los números:** 9 cláusulas por número
+
+6. **Valores iniciales:** Cláusulas unitarias para celdas pre-llenadas
+
+**Resultado:** ~8,000 cláusulas. Un SAT solver resuelve cualquier Sudoku en milisegundos.
 
 :::
-
----
-
-## Más Allá de SAT
-
-### MaxSAT
-
-Encontrar asignación que satisface el **máximo número** de cláusulas.
-
-### Weighted MaxSAT
-
-Cláusulas tienen pesos; maximizar suma de pesos de cláusulas satisfechas.
-
-### SMT (Satisfiability Modulo Theories)
-
-SAT + teorías adicionales (aritmética, arrays, bit-vectors, etc.)
-
-**Ejemplo SMT:**
-$$(x > 5) \land (y < 3) \land (x + y = 7)$$
-
-No es lógica proposicional pura, pero SMT solvers lo manejan.
 
 ---
 
 ## Ejercicios
 
-:::exercise{title="Clasificación" difficulty="1"}
+:::exercise{title="Clasificar Fórmulas" difficulty="1"}
 
-Clasifica cada fórmula como Válida, Satisfacible (no válida), o Insatisfacible:
+Clasifica cada fórmula como Válida, Satisfacible (pero no válida), o Insatisfacible:
 
-1. $(P \rightarrow Q) \lor (Q \rightarrow P)$
-2. $P \land (P \rightarrow Q) \land \neg Q$
-3. $(P \land Q) \rightarrow P$
-4. $P \leftrightarrow \neg P$
-
-:::
-
-<details>
-<summary><strong>Ver Solución</strong></summary>
-
-1. $(P \rightarrow Q) \lor (Q \rightarrow P)$
-   
-   | P | Q | P→Q | Q→P | Fórmula |
-   |---|---|-----|-----|---------|
-   | T | T | T | T | T |
-   | T | F | F | T | T |
-   | F | T | T | F | T |
-   | F | F | T | T | T |
-   
-   **Válida (Tautología)** ✓
-
-2. $P \land (P \rightarrow Q) \land \neg Q$
-   
-   Simplificando: $P \land (\neg P \lor Q) \land \neg Q$
-   
-   Si P=T: necesitamos Q (de $\neg P \lor Q$) pero también $\neg Q$. Contradicción.
-   Si P=F: $P \land ...$ es falso.
-   
-   **Insatisfacible** ✓
-
-3. $(P \land Q) \rightarrow P$
-   
-   Equivalente a $\neg(P \land Q) \lor P = \neg P \lor \neg Q \lor P = True$
-   
-   **Válida (Tautología)** ✓
-
-4. $P \leftrightarrow \neg P$
-   
-   P=T: T ↔ F = F
-   P=F: F ↔ T = F
-   
-   **Insatisfacible** ✓
-
-</details>
-
----
-
-:::exercise{title="Reducción a SAT" difficulty="2"}
-
-Tienes 3 tareas (A, B, C) y 2 empleados (1, 2). Cada tarea debe asignarse a exactamente un empleado. Además:
-- El empleado 1 no puede hacer A y B ambas
-- Si el empleado 2 hace C, también debe hacer A
-
-Formaliza como SAT (define variables y cláusulas).
+1. $(P \rightarrow Q) \land (\neg P \rightarrow Q)$
+2. $(P \rightarrow Q) \land P \land \neg Q$
+3. $P \rightarrow (Q \rightarrow P)$
+4. $(P \leftrightarrow Q) \land (P \leftrightarrow \neg Q)$
 
 :::
 
 <details>
 <summary><strong>Ver Solución</strong></summary>
 
-**Variables:** $x_{t,e}$ = "tarea t asignada a empleado e"
-- $x_{A,1}, x_{A,2}, x_{B,1}, x_{B,2}, x_{C,1}, x_{C,2}$
+**1. $(P \rightarrow Q) \land (\neg P \rightarrow Q)$**
 
-**Restricciones:**
+Esto dice "Si P entonces Q, Y si no-P entonces Q". En ambos casos, Q.
 
-1. Cada tarea a al menos un empleado:
-   - $(x_{A,1} \lor x_{A,2})$
-   - $(x_{B,1} \lor x_{B,2})$
-   - $(x_{C,1} \lor x_{C,2})$
+| P | Q | P→Q | ¬P→Q | Fórmula |
+|:-:|:-:|:---:|:----:|:-------:|
+| T | T | T | T | T |
+| T | F | F | T | F |
+| F | T | T | T | T |
+| F | F | T | F | F |
 
-2. Cada tarea a lo más un empleado:
-   - $(\neg x_{A,1} \lor \neg x_{A,2})$
-   - $(\neg x_{B,1} \lor \neg x_{B,2})$
-   - $(\neg x_{C,1} \lor \neg x_{C,2})$
+Es verdadera cuando Q=T, falsa cuando Q=F. **Satisfacible** (equivalente a Q).
 
-3. Empleado 1 no puede hacer A y B:
-   - $\neg(x_{A,1} \land x_{B,1}) = (\neg x_{A,1} \lor \neg x_{B,1})$
+**2. $(P \rightarrow Q) \land P \land \neg Q$**
 
-4. Si empleado 2 hace C, también hace A:
-   - $x_{C,2} \rightarrow x_{A,2} = (\neg x_{C,2} \lor x_{A,2})$
+Esto dice "P implica Q, Y P es verdadero, Y Q es falso". ¡Contradicción!
 
-**CNF total:** Conjunción de las 8 cláusulas anteriores.
+Si P es verdadero y P→Q, entonces Q debe ser verdadero. Pero decimos Q es falso.
+
+| P | Q | P→Q | P | ¬Q | Fórmula |
+|:-:|:-:|:---:|:-:|:--:|:-------:|
+| T | T | T | T | F | F |
+| T | F | F | T | T | F |
+| F | T | T | F | F | F |
+| F | F | T | F | T | F |
+
+**Insatisfacible**.
+
+**3. $P \rightarrow (Q \rightarrow P)$**
+
+Reescribiendo: $\neg P \lor (\neg Q \lor P) = \neg P \lor \neg Q \lor P$
+
+Siempre hay $P \lor \neg P$ que es verdadero.
+
+| P | Q | Q→P | P→(Q→P) |
+|:-:|:-:|:---:|:-------:|
+| T | T | T | T |
+| T | F | T | T |
+| F | T | F | T |
+| F | F | T | T |
+
+**Válida** (tautología).
+
+**4. $(P \leftrightarrow Q) \land (P \leftrightarrow \neg Q)$**
+
+Esto dice "P es equivalente a Q Y P es equivalente a no-Q". Imposible.
+
+Si P≡Q, entonces P y Q tienen el mismo valor.
+Si P≡¬Q, entonces P y Q tienen valores opuestos.
+No pueden ser ambas cosas.
+
+**Insatisfacible**.
 
 </details>
 
 ---
 
-:::exercise{title="DPLL Manual" difficulty="3"}
+:::exercise{title="DPLL Manual" difficulty="2"}
 
-Aplica DPLL (a mano) a:
+Aplica el algoritmo DPLL (a mano) a:
+
 $$(P \lor Q) \land (\neg P \lor R) \land (\neg Q) \land (\neg R \lor S)$$
+
+Muestra cada paso de propagación de unidad y decisiones.
 
 :::
 
@@ -430,84 +449,136 @@ $$(P \lor Q) \land (\neg P \lor R) \land (\neg Q) \land (\neg R \lor S)$$
 3. $(\neg Q)$ ← **unitaria**
 4. $(\neg R \lor S)$
 
-**Paso 1:** Unit propagation con $(\neg Q)$
-- Asignar $Q = False$
-- Cláusula (1) se simplifica: $(P)$ ← **nueva unitaria**
+**Paso 1: Propagación de unidad con $(\neg Q)$**
+- Asignar: $Q = F$
+- Simplificar cláusula (1): $(P \lor F) = (P)$ ← **nueva unitaria**
+- Cláusulas restantes: $(P)$, $(\neg P \lor R)$, $(\neg R \lor S)$
 
-**Paso 2:** Unit propagation con $(P)$
-- Asignar $P = True$
-- Cláusula (2) se simplifica: $(R)$ ← **nueva unitaria**
+**Paso 2: Propagación de unidad con $(P)$**
+- Asignar: $P = T$
+- Simplificar cláusula (2): $(\neg T \lor R) = (F \lor R) = (R)$ ← **nueva unitaria**
+- Cláusulas restantes: $(R)$, $(\neg R \lor S)$
 
-**Paso 3:** Unit propagation con $(R)$
-- Asignar $R = True$
-- Cláusula (4) se simplifica: $(S)$ ← **nueva unitaria**
+**Paso 3: Propagación de unidad con $(R)$**
+- Asignar: $R = T$
+- Simplificar cláusula (4): $(\neg T \lor S) = (F \lor S) = (S)$ ← **nueva unitaria**
+- Cláusulas restantes: $(S)$
 
-**Paso 4:** Unit propagation con $(S)$
-- Asignar $S = True$
-- Todas las cláusulas satisfechas
+**Paso 4: Propagación de unidad con $(S)$**
+- Asignar: $S = T$
+- No quedan cláusulas
 
 **Resultado:** SATISFACIBLE
-**Modelo:** $\{P=T, Q=F, R=T, S=T\}$
 
-Verificación:
+**Modelo encontrado:** $\{P=T, Q=F, R=T, S=T\}$
+
+**Verificación:**
 - $(T \lor F) = T$ ✓
 - $(F \lor T) = T$ ✓
-- $(T) = T$ ✓ (ya simplificada)
+- $(T)$ simplificada ✓
 - $(F \lor T) = T$ ✓
+
+**Observación:** DPLL encontró la solución usando solo propagación de unidad, sin necesidad de backtracking. ¡Muy eficiente para este caso!
 
 </details>
 
 ---
 
-:::exercise{title="¿Cuándo es fácil?" difficulty="2"}
+:::exercise{title="¿P o NP-completo?" difficulty="1"}
 
-¿Cuáles de las siguientes están en P?
+Clasifica cada variante de SAT:
 
-1. 2-SAT
-2. 3-SAT
-3. Horn-SAT
-4. CNF donde cada cláusula tiene exactamente 47 literales
+1. Cláusulas con exactamente 2 literales cada una
+2. Cláusulas con exactamente 3 literales cada una
+3. Todas las cláusulas son de Horn
+4. Cláusulas con a lo más 47 literales cada una
 
 :::
 
 <details>
 <summary><strong>Ver Solución</strong></summary>
 
-1. **2-SAT** → **P** ✓ (algoritmo lineal basado en componentes fuertemente conexos)
+1. **Exactamente 2 literales (2-SAT):**
+   - **En P** — resoluble en tiempo lineal con algoritmo de componentes fuertemente conexos
 
-2. **3-SAT** → **NP-completo** ✗ (el problema de referencia para NP-completitud)
+2. **Exactamente 3 literales (3-SAT):**
+   - **NP-completo** — es el problema de referencia para demostraciones de NP-completitud
 
-3. **Horn-SAT** → **P** ✓ (forward chaining en tiempo lineal)
+3. **Cláusulas de Horn:**
+   - **En P** — resoluble en tiempo lineal con forward chaining
 
-4. **47-SAT** → **NP-completo** ✗ (cualquier k-SAT con k≥3 es NP-completo)
+4. **A lo más 47 literales:**
+   - **NP-completo** — cualquier k-SAT con k ≥ 3 es NP-completo
+   - 47-SAT es tan difícil como 3-SAT (de hecho, 3-SAT se puede reducir a cualquier k-SAT con k ≥ 3)
 
-La frontera está entre k=2 (P) y k≥3 (NP-completo).
+**La frontera crítica:**
+- 2-SAT: P (fácil)
+- 3-SAT o más: NP-completo (difícil)
 
 </details>
 
 ---
 
-:::prompt{title="Entender SAT" for="Claude/ChatGPT"}
+:::exercise{title="Reducción a SAT" difficulty="3"}
 
-Quiero entender mejor SAT y su importancia. Por favor:
+Tienes 4 estudiantes (A, B, C, D) y 3 proyectos (1, 2, 3).
+- Cada estudiante debe trabajar en exactamente un proyecto.
+- Cada proyecto necesita al menos un estudiante.
+- A y B no pueden trabajar juntos.
+- C debe trabajar en el proyecto 1 o el proyecto 2.
 
-1. Explícame intuitivamente por qué SAT es NP-completo
-2. Dame un ejemplo de cómo reducir un problema del mundo real a SAT
-3. Explica por qué los SAT solvers funcionan bien en la práctica a pesar de NP-completitud
-4. ¿Qué pasa si P=NP se demuestra verdadero?
-
-Usa ejemplos concretos y evita jerga innecesaria.
+Formula este problema como SAT. Define las variables y escribe las cláusulas.
 
 :::
+
+<details>
+<summary><strong>Ver Solución</strong></summary>
+
+**Variables:** $x_{E,P}$ = "estudiante E trabaja en proyecto P"
+- 4 estudiantes × 3 proyectos = 12 variables
+- $x_{A,1}, x_{A,2}, x_{A,3}, x_{B,1}, \ldots, x_{D,3}$
+
+**Restricción 1: Cada estudiante en al menos un proyecto**
+- $x_{A,1} \lor x_{A,2} \lor x_{A,3}$
+- $x_{B,1} \lor x_{B,2} \lor x_{B,3}$
+- $x_{C,1} \lor x_{C,2} \lor x_{C,3}$
+- $x_{D,1} \lor x_{D,2} \lor x_{D,3}$
+
+**Restricción 2: Cada estudiante en a lo más un proyecto**
+Para cada estudiante, pares de proyectos diferentes:
+- $\neg x_{A,1} \lor \neg x_{A,2}$, $\neg x_{A,1} \lor \neg x_{A,3}$, $\neg x_{A,2} \lor \neg x_{A,3}$
+- (similar para B, C, D) — 12 cláusulas más
+
+**Restricción 3: Cada proyecto tiene al menos un estudiante**
+- $x_{A,1} \lor x_{B,1} \lor x_{C,1} \lor x_{D,1}$
+- $x_{A,2} \lor x_{B,2} \lor x_{C,2} \lor x_{D,2}$
+- $x_{A,3} \lor x_{B,3} \lor x_{C,3} \lor x_{D,3}$
+
+**Restricción 4: A y B no juntos** (en ningún proyecto)
+- $\neg x_{A,1} \lor \neg x_{B,1}$
+- $\neg x_{A,2} \lor \neg x_{B,2}$
+- $\neg x_{A,3} \lor \neg x_{B,3}$
+
+**Restricción 5: C en proyecto 1 o 2**
+- $x_{C,1} \lor x_{C,2}$
+
+**Total:** 4 + 12 + 3 + 3 + 1 = 23 cláusulas
+
+Un SAT solver encontraría una asignación válida (si existe) en milisegundos.
+
+</details>
 
 ---
 
 ## Puntos Clave
 
-1. **Satisfacible** = verdadera en algún modelo; **Válida** = verdadera en todos
-2. $\alpha \models \beta \iff \alpha \land \neg\beta$ insatisfacible
-3. **SAT es NP-completo** — no hay algoritmo polinomial conocido
-4. **DPLL** mejora fuerza bruta con: unit propagation, pure literal, early termination
-5. **SAT solvers modernos** (CDCL) resuelven millones de variables en práctica
-6. **2-SAT** y **Horn-SAT** están en **P** — casos especiales eficientes
-7. SAT tiene aplicaciones en verificación, planificación, seguridad, etc.
+1. **Satisfacible** = verdadera en al menos un modelo
+2. **Insatisfacible** = falsa en todos los modelos (contradicción)
+3. **Válida** = verdadera en todos los modelos (tautología)
+4. $\alpha \models \beta \iff (\alpha \land \neg\beta)$ es insatisfacible
+5. **SAT** es el problema de determinar satisfacibilidad
+6. **SAT es NP-completo** — no se conoce algoritmo polinomial
+7. **DPLL** mejora la búsqueda con: propagación de unidad, literales puros, terminación temprana
+8. **SAT solvers modernos** (CDCL) resuelven millones de variables en la práctica
+9. **2-SAT** y **Horn-SAT** están en P — casos especiales eficientes
+10. SAT tiene aplicaciones en verificación, planificación, criptografía y más

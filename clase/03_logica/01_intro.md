@@ -4,9 +4,16 @@ title: "Introducción: ¿Por qué Lógica?"
 
 # Introducción: ¿Por qué Lógica?
 
-## De Reflex a Razonamiento
+## El Salto de Reaccionar a Razonar
 
-En la clase anterior vimos diferentes arquitecturas de agentes:
+En la clase anterior exploramos diferentes tipos de agentes. Vimos que los **agentes reflejo simples** funcionan con reglas directas:
+
+```
+si percepción == "sucio" entonces Aspirar
+si percepción == "limpio" entonces Mover
+```
+
+Estos agentes son como máquinas expendedoras: estímulo → respuesta. Funcionan bien en situaciones simples y predecibles.
 
 ```mermaid
 graph LR
@@ -20,177 +27,204 @@ graph LR
     style C fill:#059669,stroke:#047857,color:#fff
 ```
 
-Los **Simple Reflex Agents** actúan por reglas fijas:
-```
-if percept == "dirty" then Suck
-```
-
-Pero ¿qué pasa cuando el agente necesita **razonar** sobre situaciones que nunca ha visto? ¿Cómo puede derivar **nuevas conclusiones** de lo que sabe?
-
-La respuesta: **Lógica**.
+**Pero hay un problema fundamental:** ¿Qué hace el agente cuando enfrenta una situación que nunca ha visto? ¿Cómo puede derivar **conclusiones nuevas** a partir de lo que ya sabe?
 
 ---
 
-## El Problema Fundamental
+## Un Problema Motivador
 
-Imagina un agente en una cueva peligrosa (el famoso **Wumpus World**):
+Imagina que eres un explorador en una cueva peligrosa. No puedes ver más allá de donde estás parado. La cueva tiene pozos mortales, pero también tiene pistas: sientes una brisa cuando hay un pozo cerca.
 
 ![Wumpus World - El agente debe razonar para sobrevivir]({{ '/03_logica/images/wumpus_world_intro.png' | url }})
 
-El agente percibe:
-- Brisa en [1,2] → Hay un pozo adyacente
-- No hay brisa en [1,1] → No hay pozos adyacentes a [1,1]
+**Situación:**
+- En la celda [1,1]: No sientes brisa
+- Avanzas a [1,2]: ¡Sientes brisa!
 
-**Pregunta**: ¿Es seguro moverse a [2,2]?
+**Pregunta crítica:** ¿Es seguro avanzar a [2,2]?
 
-Un **Simple Reflex Agent** no puede responder esto — no tiene una regla para cada combinación posible de percepts.
+Un agente reflejo simple no puede responder esto. No tiene una regla "si brisa en [1,2] entonces..." para cada posible combinación de percepciones.
 
-Un **Knowledge-Based Agent** puede:
-1. **Representar** lo que sabe en un lenguaje formal
-2. **Inferir** nuevos hechos de lo que sabe
-3. **Decidir** basándose en sus inferencias
+Para resolver este problema, el agente necesita:
+1. **Recordar** lo que percibió en cada lugar
+2. **Combinar** esa información 
+3. **Derivar** nuevas conclusiones
+
+Este tipo de razonamiento sistemático es exactamente lo que proporciona la **lógica**.
 
 ---
 
-## ¿Qué es un Agente Basado en Conocimiento?
+## Agentes Basados en Conocimiento
 
-Un **Knowledge-Based Agent** tiene dos componentes principales:
+Un **agente basado en conocimiento** (Knowledge-Based Agent) tiene dos componentes principales que le permiten razonar:
 
 ```mermaid
 graph TD
-    subgraph "Knowledge-Based Agent"
-        KB[Knowledge Base]
-        INF[Inference Engine]
+    subgraph "Agente Basado en Conocimiento"
+        KB[Base de Conocimiento<br/>Knowledge Base]
+        INF[Motor de Inferencia<br/>Inference Engine]
     end
     
-    P[Percepts] --> KB
+    P[Percepciones] --> KB
     KB --> INF
     INF --> KB
-    INF --> A[Actions]
+    INF --> A[Acciones]
     
     style KB fill:#8b5cf6,stroke:#7c3aed,color:#fff
     style INF fill:#14b8a6,stroke:#0d9488,color:#fff
 ```
 
-| Componente | Descripción | Analogía |
-|------------|-------------|----------|
-| **Knowledge Base (KB)** | Conjunto de hechos conocidos | "Lo que sé" |
-| **Inference Engine** | Mecanismo para derivar nuevos hechos | "Cómo razono" |
+### La Base de Conocimiento (KB)
+
+La KB es donde el agente guarda todo lo que sabe. Contiene:
+
+- **Hechos observados:** "No hay brisa en [1,1]", "Hay brisa en [2,1]"
+- **Reglas del mundo:** "Si hay brisa, entonces hay un pozo adyacente"
+- **Conocimiento previo:** "El agente empieza en [1,1], que es segura"
+
+### El Motor de Inferencia
+
+El motor de inferencia es el "cerebro" que procesa la KB para derivar nuevas conclusiones. Toma los hechos y reglas que tiene y produce nuevos hechos.
+
+**Ejemplo:**
+- Hecho: "Hay brisa en [2,1]"
+- Regla: "Brisa significa pozo adyacente"
+- **Conclusión derivada:** "Hay pozo en [1,1], [3,1], [2,0] o [2,2]"
 
 ### El Ciclo del Agente
 
-```
-function KB-AGENT(percept):
-    TELL(KB, MAKE-PERCEPT-SENTENCE(percept, t))
-    action ← ASK(KB, MAKE-ACTION-QUERY(t))
-    TELL(KB, MAKE-ACTION-SENTENCE(action, t))
-    t ← t + 1
-    return action
-```
+En cada momento, el agente:
 
-**TELL**: Añade conocimiento a la KB
-**ASK**: Consulta si algo se puede inferir de la KB
+1. **TELL (decir):** Añade lo que percibe a su KB
+2. **ASK (preguntar):** Consulta a la KB qué acciones son seguras
+3. **TELL:** Registra la acción que tomó
+
+```
+función AGENTE-KB(percepción):
+    TELL(KB, convertir_a_sentencia(percepción))
+    acción ← ASK(KB, "¿qué acción debo tomar?")
+    TELL(KB, convertir_a_sentencia(acción))
+    return acción
+```
 
 ---
 
 ## ¿Por Qué un Lenguaje Formal?
 
-El conocimiento debe representarse en un **lenguaje formal** por varias razones:
+El conocimiento del agente debe estar en un **lenguaje formal** — no en español ni en inglés. ¿Por qué?
 
-| Razón | Explicación |
-|-------|-------------|
-| **Precisión** | Sin ambigüedad del lenguaje natural |
-| **Mecanizable** | Las computadoras pueden procesarlo |
-| **Verificable** | Podemos probar propiedades |
-| **Composicional** | El significado de expresiones complejas deriva de sus partes |
+### El Problema de la Ambigüedad
 
-### Ejemplo: Ambigüedad del Lenguaje Natural
+El lenguaje natural es ambiguo:
 
-"Vi al hombre con el telescopio"
+> "Vi al hombre con el telescopio"
+
+¿Qué significa?
 - ¿Usé un telescopio para verlo?
 - ¿El hombre tenía un telescopio?
 
-En lógica formal:
-- $Saw(I, Man) \land Used(I, Telescope)$
-- $Saw(I, Man) \land Has(Man, Telescope)$
+Ambas interpretaciones son válidas en español. Una computadora no sabría cuál elegir.
 
-**No hay ambigüedad.**
+### Las Ventajas del Lenguaje Formal
+
+En un lenguaje formal como la lógica proposicional:
+
+| Ventaja | Explicación |
+|---------|-------------|
+| **Sin ambigüedad** | Cada expresión tiene un único significado |
+| **Procesable por máquina** | Las computadoras pueden manipularlo |
+| **Verificable** | Podemos demostrar propiedades matemáticamente |
+| **Composicional** | El significado de una expresión compleja se deriva de sus partes |
+
+**En lógica, las dos interpretaciones serían distintas:**
+- $Vio(Yo, Hombre) \land Usó(Yo, Telescopio)$
+- $Vio(Yo, Hombre) \land Tiene(Hombre, Telescopio)$
+
+No hay confusión posible.
 
 ---
 
-## El Enfoque "Thinking Rationally"
+## El Enfoque "Pensando Racionalmente"
 
-Recuerda los 4 enfoques de la IA (Clase 2):
+¿Recuerdas los 4 enfoques de la IA de la Clase 2?
 
-|  | **Humanamente** | **Racionalmente** |
+|  | **Como Humano** | **Racionalmente** |
 |--|-----------------|-------------------|
-| **Pensar** | Ciencia Cognitiva | **Leyes del Pensamiento** |
+| **Pensar** | Ciencia Cognitiva | **Leyes del Pensamiento** ← |
 | **Actuar** | Test de Turing | Agentes Racionales |
 
-La lógica es el corazón de **"Thinking Rationally"** — las **Leyes del Pensamiento**.
+La lógica es el corazón del enfoque **"Pensando Racionalmente"**. La idea es que hay patrones de razonamiento que siempre producen conclusiones correctas, independientemente de quién los use.
 
-### Las Leyes del Pensamiento (Aristóteles)
+### Las Leyes del Pensamiento
 
-Aristóteles identificó patrones de razonamiento **siempre válidos**:
+Aristóteles (384-322 a.C.) identificó patrones de razonamiento que son universalmente válidos. El más famoso:
 
-**Silogismo:**
+**El Silogismo:**
 ```
-Todos los hombres son mortales.
-Sócrates es hombre.
-∴ Sócrates es mortal.
+Premisa 1: Todos los hombres son mortales.
+Premisa 2: Sócrates es hombre.
+Conclusión: Sócrates es mortal.
 ```
 
-Si las premisas son verdaderas, la conclusión **debe** ser verdadera.
+Si las premisas son verdaderas, la conclusión **debe** ser verdadera. No hay forma de que sea de otra manera.
+
+Este patrón funciona sin importar de qué se trate:
+```
+Premisa 1: Todos los pájaros tienen alas.
+Premisa 2: Un canario es un pájaro.
+Conclusión: Un canario tiene alas.
+```
+
+La lógica formaliza estos patrones para que las máquinas puedan usarlos.
 
 ---
 
 ## Tipos de Lógica
 
-La lógica viene en diferentes "sabores":
+La lógica no es una sola cosa — hay diferentes "sabores" para diferentes necesidades:
 
-| Tipo | Qué Representa | Ejemplo | Complejidad |
-|------|----------------|---------|-------------|
-| **Proposicional** | Hechos verdadero/falso | "Está lloviendo" | Decidible (NP) |
-| **Primer Orden (FOL)** | Objetos, relaciones, cuantificadores | "Todos los humanos son mortales" | Semi-decidible |
+| Tipo de Lógica | ¿Qué puede expresar? | Ejemplo | Complejidad |
+|----------------|---------------------|---------|-------------|
+| **Proposicional** | Hechos simples (verdadero/falso) | "Está lloviendo" | Decidible (NP) |
+| **Primer Orden** | Objetos, relaciones, cuantificadores | "Todos los humanos son mortales" | Semi-decidible |
 | **Temporal** | Cambios en el tiempo | "Eventualmente llegará" | Varía |
-| **Modal** | Necesidad, posibilidad | "Necesariamente P" | Varía |
-| **Probabilística** | Grados de creencia | "Probablemente P" | Clase 5 |
+| **Modal** | Necesidad, posibilidad | "Es posible que llueva" | Varía |
+| **Probabilística** | Grados de creencia | "Probablemente llueva" | Clase 5 |
 
-En este módulo nos enfocamos en **Lógica Proposicional** — la más simple, pero fundamental.
-
----
-
-## Ventajas y Limitaciones de la Lógica
-
-### ✓ Ventajas
-
-| Ventaja | Descripción |
-|---------|-------------|
-| **Precisión** | No hay ambigüedad |
-| **Soundness** | Solo deriva conclusiones verdaderas |
-| **Completeness** | Puede derivar todo lo que es verdad |
-| **Composicionalidad** | Significado de partes → significado del todo |
-| **Herramientas** | SAT solvers muy optimizados |
-
-### ✗ Limitaciones
-
-| Limitación | Descripción | Solución |
-|------------|-------------|----------|
-| **Binaria** | Solo verdadero/falso, no "probable" | Probabilidad (Clase 5) |
-| **Computacional** | SAT es NP-completo | Heurísticas, SAT solvers |
-| **Conocimiento completo** | Asume que sabemos todo lo relevante | Lógica no-monótona |
-| **Estática** | No captura cambios fácilmente | Lógica temporal |
+En este módulo nos enfocamos en **lógica proposicional** — la más simple, pero que ilustra todos los conceptos fundamentales.
 
 ---
 
-## Mapa del Módulo
+## Ventajas y Limitaciones
+
+### Lo Bueno de la Lógica
+
+| Ventaja | ¿Por qué importa? |
+|---------|-------------------|
+| **Precisión** | No hay ambigüedad — sabemos exactamente qué significa cada expresión |
+| **Correctitud (Soundness)** | Si derivamos algo, es verdad — no hay conclusiones falsas |
+| **Completitud** | Podemos derivar todo lo que es verdad |
+| **Herramientas** | Existen SAT solvers muy optimizados para problemas reales |
+
+### Las Limitaciones
+
+| Limitación | ¿Por qué es problema? | ¿Cómo se resuelve? |
+|------------|----------------------|-------------------|
+| **Solo verdadero/falso** | No puedo decir "probablemente" | Probabilidad (Clase 5) |
+| **Computacionalmente difícil** | SAT es NP-completo | Heurísticas, SAT solvers |
+| **Asume conocimiento completo** | "Lo que no sé, no existe" | Lógica no-monótona |
+| **Estática** | No captura cambio fácilmente | Lógica temporal |
+
+---
+
+## Mapa de Este Módulo
 
 ```mermaid
 graph TD
-    A[3.1 Intro] --> B[3.2 Lógica Proposicional]
-    B --> C[3.3 Inferencia]
-    C --> D[3.4 SAT]
-    B --> E[3.5 Wumpus World]
+    A["3.1 Introducción<br/>¿Por qué lógica?"] --> B["3.2 Lógica Proposicional<br/>El lenguaje formal"]
+    B --> C["3.3 Inferencia<br/>Derivando conclusiones"]
+    C --> D["3.4 SAT<br/>Límites computacionales"]
+    B --> E["3.5 Wumpus World<br/>Aplicación completa"]
     C --> E
     D --> E
     
@@ -201,67 +235,80 @@ graph TD
     style E fill:#059669,stroke:#047857,color:#fff
 ```
 
-| Sección | Pregunta que Responde |
+| Sección | Pregunta que responde |
 |---------|----------------------|
-| **3.2 Lógica Proposicional** | ¿Cómo represento conocimiento? |
+| **3.2 Lógica Proposicional** | ¿Cómo represento conocimiento formalmente? |
 | **3.3 Inferencia** | ¿Cómo derivo nuevas conclusiones? |
-| **3.4 SAT** | ¿Qué puedo computar? |
-| **3.5 Wumpus World** | ¿Cómo aplico todo junto? |
+| **3.4 SAT** | ¿Qué puedo y qué no puedo computar? |
+| **3.5 Wumpus World** | ¿Cómo aplico todo esto a un problema real? |
 
 ---
 
 ## Preguntas para Reflexionar
 
-Antes de continuar, piensa:
+Antes de continuar, piensa en estas preguntas:
 
-1. ¿Cómo razonas tú cuando juegas Minesweeper?
-2. ¿Qué diferencia hay entre "saber" algo y "poder demostrarlo"?
-3. Si solo puedes representar verdadero/falso, ¿cómo manejas "no sé"?
-4. ¿Por qué crees que los sistemas expertos de los 80s usaban lógica?
+1. **Minesweeper:** ¿Cómo razonas cuando juegas? Cuando ves un "2", ¿cómo decides qué celdas son seguras?
+
+2. **Saber vs. Demostrar:** ¿Cuál es la diferencia entre "saber" algo y "poder demostrarlo"?
+
+3. **Incertidumbre:** Si la lógica solo permite verdadero/falso, ¿cómo representamos "no sé"?
+
+4. **Historia:** ¿Por qué crees que los sistemas expertos de los años 80 (como MYCIN para diagnóstico médico) usaban lógica?
 
 ---
 
+## Ejercicio de Calentamiento
+
 :::exercise{title="Razonamiento Informal" difficulty="1"}
 
-Sin usar lógica formal, razona sobre este problema:
+Sin usar lógica formal, analiza este razonamiento:
 
-**Situación:**
-- Si llueve, la calle se moja.
-- La calle está mojada.
+**Premisas:**
+1. Si llueve, la calle se moja.
+2. La calle está mojada.
 
-**Pregunta:** ¿Podemos concluir que llovió?
+**Conclusión propuesta:** Llovió.
 
-**Análisis:**
+**Preguntas:**
 1. ¿Es válida esta conclusión?
 2. ¿Qué otras explicaciones hay para que la calle esté mojada?
-3. ¿Cómo formalizarías este razonamiento?
+3. ¿Cómo distinguirías un razonamiento válido de uno inválido?
 
 :::
 
 <details>
 <summary><strong>Ver Análisis</strong></summary>
 
-**Respuesta:** No, no podemos concluir que llovió.
+**1. ¿Es válida?** No, no es válida.
 
-Este es un error lógico llamado **Afirmación del Consecuente**:
+Este es un error lógico clásico llamado **"Afirmación del Consecuente"**:
 - Premisa 1: Si P entonces Q (Si llueve → calle mojada)
 - Premisa 2: Q (calle mojada)
 - Conclusión incorrecta: P (llovió)
 
-**Otras explicaciones:**
-- Alguien lavó su carro
+El error es asumir que la única causa de Q es P.
+
+**2. Otras explicaciones:**
+- Alguien lavó su carro y salpicó agua
 - Se rompió una tubería
-- Pasó un camión de riego
+- Pasó el camión de riego
+- Un vecino regó sus plantas
+- Hubo una inundación
 
-**Formalización:**
-- $Llueve \rightarrow CalleMojada$ ✓
-- $CalleMojada$ ✓
-- $Llueve$ ✗ (no se puede derivar)
+**3. ¿Qué SÍ sería válido?**
 
-Lo que sí sería válido:
+**Modus Ponens** (que veremos en detalle):
 - Si llueve → calle mojada
 - Llovió
-- ∴ Calle mojada (**Modus Ponens** — veremos en 3.3)
+- ∴ Calle mojada ✓
+
+**Modus Tollens**:
+- Si llueve → calle mojada
+- Calle NO está mojada
+- ∴ NO llovió ✓
+
+La lógica nos da herramientas precisas para distinguir razonamientos válidos de falacias.
 
 </details>
 
@@ -269,9 +316,9 @@ Lo que sí sería válido:
 
 ## Puntos Clave
 
-1. Los **Simple Reflex Agents** no pueden razonar sobre situaciones nuevas
-2. Los **Knowledge-Based Agents** representan conocimiento y derivan conclusiones
-3. La lógica proporciona un **lenguaje formal** sin ambigüedad
-4. El enfoque **"Thinking Rationally"** usa las leyes del pensamiento (lógica)
-5. La lógica proposicional es simple pero tiene **limitaciones** (binaria, NP-completo)
-6. Este módulo cubre: sintaxis, semántica, inferencia, SAT, y aplicación
+1. Los **agentes reflejo simples** no pueden razonar sobre situaciones nuevas
+2. Los **agentes basados en conocimiento** tienen una KB y un motor de inferencia
+3. El conocimiento se representa en un **lenguaje formal** para evitar ambigüedad
+4. La lógica implementa las **"leyes del pensamiento"** — patrones de razonamiento universalmente válidos
+5. La **lógica proposicional** es el tipo más simple, pero tiene limitaciones
+6. Este módulo cubre: representación (sintaxis), significado (semántica), inferencia, y aplicación

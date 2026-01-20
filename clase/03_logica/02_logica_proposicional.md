@@ -4,110 +4,159 @@ title: "Lógica Proposicional"
 
 # Lógica Proposicional
 
-El lenguaje más simple para representar conocimiento.
+El lenguaje más simple para representar conocimiento formal.
+
+## Introducción: ¿Qué Vamos a Aprender?
+
+En esta sección aprenderemos el **lenguaje** que usaremos para representar conocimiento. Así como el español tiene gramática y significado, la lógica proposicional tiene:
+
+- **Sintaxis**: Las reglas que dicen qué expresiones están "bien escritas"
+- **Semántica**: El significado de esas expresiones (cuándo son verdaderas o falsas)
+
+Al final de esta sección podrás:
+- Escribir afirmaciones en lógica proposicional
+- Determinar si una fórmula es verdadera o falsa
+- Convertir fórmulas a formas estándar (CNF)
+
+---
 
 ## ¿Qué es una Proposición?
 
-Una **proposición** es una declaración que puede ser **verdadera** o **falsa**, pero no ambas.
+Antes de hablar de lógica, necesitamos entender qué es una **proposición**.
 
-| Declaración | ¿Es proposición? | Valor |
-|-------------|------------------|-------|
-| "Está lloviendo" | ✓ Sí | V o F |
-| "2 + 2 = 4" | ✓ Sí | V |
-| "¿Qué hora es?" | ✗ No | Pregunta |
-| "¡Cierra la puerta!" | ✗ No | Imperativo |
-| "x > 5" | ✗ No* | Depende de x |
+Una **proposición** es una oración declarativa que puede ser **verdadera** o **falsa**, pero no ambas al mismo tiempo. Este es el bloque fundamental de la lógica proposicional.
 
-*En lógica proposicional no hay variables. En FOL (lógica de primer orden) sí.
+### Ejemplos de Proposiciones
 
----
+| Oración | ¿Es proposición? | ¿Por qué? |
+|---------|:----------------:|-----------|
+| "Está lloviendo" | ✓ Sí | Puede ser verdadera o falsa dependiendo del clima |
+| "2 + 2 = 4" | ✓ Sí | Es verdadera (siempre) |
+| "La luna es de queso" | ✓ Sí | Es falsa, pero sigue siendo una proposición |
+| "¿Qué hora es?" | ✗ No | Es una pregunta, no una declaración |
+| "¡Cierra la puerta!" | ✗ No | Es una orden, no se puede evaluar como V o F |
+| "Esta oración es falsa" | ✗ No | Es una paradoja (no puede ser ni V ni F) |
+| "x > 5" | ✗ No | Depende del valor de x — no es determinable |
 
-## Sintaxis de la Lógica Proposicional
-
-La **sintaxis** define qué expresiones son "gramaticalmente correctas".
-
-### Símbolos Proposicionales
-
-Los átomos básicos son **símbolos proposicionales**:
-
-| Símbolo | Interpretación típica |
-|---------|----------------------|
-| $P, Q, R, S$ | Proposiciones cualesquiera |
-| $True$ | Siempre verdadero |
-| $False$ | Siempre falso |
-
-### Conectivos Lógicos
-
-Los conectivos combinan proposiciones:
-
-| Conectivo | Nombre | Símbolo | Lectura |
-|-----------|--------|---------|---------|
-| **Negación** | NOT | $\neg$ | "no P" |
-| **Conjunción** | AND | $\land$ | "P y Q" |
-| **Disyunción** | OR | $\lor$ | "P o Q" |
-| **Implicación** | IF-THEN | $\rightarrow$ | "si P entonces Q" |
-| **Bicondicional** | IFF | $\leftrightarrow$ | "P si y solo si Q" |
-
-### Gramática Formal (BNF)
-
-```
-Sentencia → AtomicSentence | ComplexSentence
-AtomicSentence → True | False | Symbol
-Symbol → P | Q | R | ...
-ComplexSentence → ¬ Sentencia
-                | Sentencia ∧ Sentencia
-                | Sentencia ∨ Sentencia
-                | Sentencia → Sentencia
-                | Sentencia ↔ Sentencia
-                | ( Sentencia )
-```
-
-### Precedencia de Operadores
-
-Del más alto al más bajo:
-
-| Prioridad | Operador | Asociatividad |
-|-----------|----------|---------------|
-| 1 (más alta) | $\neg$ | — |
-| 2 | $\land$ | Izquierda |
-| 3 | $\lor$ | Izquierda |
-| 4 | $\rightarrow$ | Derecha |
-| 5 (más baja) | $\leftrightarrow$ | — |
-
-**Ejemplo:**
-$$\neg P \land Q \rightarrow R$$
-
-Se parsea como:
-$$((\neg P) \land Q) \rightarrow R$$
+La última fila es importante: en lógica **proposicional** no hay variables como "x". Cada proposición debe ser evaluable como verdadera o falsa sin información adicional. (Las variables aparecen en lógica de primer orden, que es más avanzada.)
 
 ---
 
-## Semántica de la Lógica Proposicional
+## La Sintaxis: Construyendo Fórmulas
 
-La **semántica** define qué **significan** las expresiones — cuándo son verdaderas o falsas.
+La **sintaxis** son las reglas gramaticales de nuestro lenguaje lógico. Define qué combinaciones de símbolos son expresiones válidas.
 
-### Modelos e Interpretaciones
+### Los Bloques Básicos: Símbolos Proposicionales
 
-Un **modelo** $m$ es una asignación de valores de verdad a todos los símbolos proposicionales.
+Usamos letras mayúsculas para representar proposiciones:
 
-**Ejemplo:** Si tenemos símbolos $\{P, Q, R\}$:
-- $m_1 = \{P=True, Q=True, R=False\}$
-- $m_2 = \{P=False, Q=True, R=True\}$
+| Símbolo | Lo que representa |
+|---------|-------------------|
+| $P$, $Q$, $R$, $S$, ... | Proposiciones que elegimos (les damos significado nosotros) |
+| $True$ (o $\top$) | Una proposición que siempre es verdadera |
+| $False$ (o $\bot$) | Una proposición que siempre es falsa |
 
-Para $n$ símbolos, hay $2^n$ modelos posibles.
+**Ejemplo de asignación de significado:**
+- $P$ = "Está lloviendo"
+- $Q$ = "Tengo un paraguas"
+- $R$ = "Me voy a mojar"
 
-### Tablas de Verdad
+Los símbolos solos no significan nada — nosotros les damos significado al modelar un problema.
 
-Las tablas de verdad definen la semántica de cada conectivo:
+### Los Conectivos Lógicos: Combinando Proposiciones
 
-#### Negación ($\neg$)
+Los **conectivos** nos permiten construir proposiciones complejas a partir de proposiciones simples. Son como las conjunciones del español ("y", "o", "si...entonces").
+
+| Conectivo | Símbolo | Nombre Técnico | Se lee como... | Ejemplo |
+|-----------|:-------:|----------------|----------------|---------|
+| **NO** | $\neg$ | Negación | "no P", "es falso que P" | $\neg P$ = "No está lloviendo" |
+| **Y** | $\land$ | Conjunción | "P y Q" | $P \land Q$ = "Llueve y tengo paraguas" |
+| **O** | $\lor$ | Disyunción | "P o Q (o ambos)" | $P \lor Q$ = "Llueve o tengo paraguas" |
+| **SI...ENTONCES** | $\rightarrow$ | Implicación | "si P entonces Q" | $P \rightarrow R$ = "Si llueve, me mojo" |
+| **SI Y SOLO SI** | $\leftrightarrow$ | Bicondicional | "P si y solo si Q" | $P \leftrightarrow Q$ = "Llueve exactamente cuando tengo paraguas" |
+
+### Construyendo Fórmulas Complejas
+
+Podemos combinar conectivos para hacer fórmulas más complejas:
+
+**Ejemplo:** "Si llueve y no tengo paraguas, entonces me mojo"
+
+Paso a paso:
+1. $P$ = "Llueve"
+2. $Q$ = "Tengo paraguas"  
+3. $R$ = "Me mojo"
+4. "No tengo paraguas" = $\neg Q$
+5. "Llueve y no tengo paraguas" = $P \land \neg Q$
+6. Fórmula completa: $(P \land \neg Q) \rightarrow R$
+
+### Precedencia de Operadores (Orden de Evaluación)
+
+Cuando escribimos $\neg P \land Q$, ¿qué se evalúa primero?
+
+Al igual que en matemáticas donde $2 + 3 \times 4 = 14$ (no 20) porque la multiplicación tiene precedencia, en lógica hay un orden:
+
+| Prioridad | Operador | Ejemplo |
+|:---------:|:--------:|---------|
+| 1 (más alta) | $\neg$ | $\neg P \land Q$ significa $(\neg P) \land Q$ |
+| 2 | $\land$ | $P \land Q \lor R$ significa $(P \land Q) \lor R$ |
+| 3 | $\lor$ | |
+| 4 | $\rightarrow$ | |
+| 5 (más baja) | $\leftrightarrow$ | |
+
+**Consejo:** Cuando hay duda, usa paréntesis para ser explícito. Es mejor escribir $(P \land Q) \rightarrow R$ que confiar en la precedencia.
+
+---
+
+## La Semántica: El Significado de las Fórmulas
+
+La **semántica** nos dice cuándo una fórmula es verdadera y cuándo es falsa. Para esto necesitamos el concepto de **modelo**.
+
+### ¿Qué es un Modelo?
+
+Un **modelo** (también llamado **interpretación**) es una asignación de valores de verdad (True o False) a cada símbolo proposicional.
+
+**Ejemplo:** Si tenemos los símbolos $P$, $Q$, $R$:
+
+Un modelo posible es:
+$$m_1 = \{P = True, Q = False, R = True\}$$
+
+Esto significa: "En este modelo, P es verdadera, Q es falsa, y R es verdadera."
+
+Otro modelo posible es:
+$$m_2 = \{P = False, Q = False, R = False\}$$
+
+### ¿Cuántos Modelos Hay?
+
+Si tenemos $n$ símbolos proposicionales, cada uno puede ser True o False. Por lo tanto, hay $2^n$ modelos posibles.
+
+| Símbolos | Modelos Posibles |
+|:--------:|:----------------:|
+| 1 ($P$) | $2^1 = 2$ |
+| 2 ($P$, $Q$) | $2^2 = 4$ |
+| 3 ($P$, $Q$, $R$) | $2^3 = 8$ |
+| 10 | $2^{10} = 1024$ |
+| 100 | $2^{100} \approx 10^{30}$ |
+
+Este crecimiento exponencial es importante — veremos que tiene implicaciones computacionales serias.
+
+### Tablas de Verdad: Definiendo el Significado de los Conectivos
+
+Las **tablas de verdad** definen exactamente cuándo cada conectivo produce True o False.
+
+#### Negación ($\neg$): "NO"
+
+La negación invierte el valor de verdad:
 
 | $P$ | $\neg P$ |
 |:---:|:--------:|
 | T | F |
 | F | T |
 
-#### Conjunción ($\land$)
+**Intuición:** Si "está lloviendo" es verdadero, entonces "NO está lloviendo" es falso, y viceversa.
+
+#### Conjunción ($\land$): "Y"
+
+La conjunción es verdadera solo cuando **ambas** partes son verdaderas:
 
 | $P$ | $Q$ | $P \land Q$ |
 |:---:|:---:|:-----------:|
@@ -116,9 +165,11 @@ Las tablas de verdad definen la semántica de cada conectivo:
 | F | T | F |
 | F | F | F |
 
-"Ambos deben ser verdaderos"
+**Intuición:** "Tengo hambre Y tengo dinero" solo es verdadero si ambas cosas son ciertas. Si cualquiera es falsa, todo es falso.
 
-#### Disyunción ($\lor$)
+#### Disyunción ($\lor$): "O" (inclusivo)
+
+La disyunción es verdadera cuando **al menos una** parte es verdadera:
 
 | $P$ | $Q$ | $P \lor Q$ |
 |:---:|:---:|:---------:|
@@ -127,9 +178,13 @@ Las tablas de verdad definen la semántica de cada conectivo:
 | F | T | T |
 | F | F | **F** |
 
-"Al menos uno debe ser verdadero" (OR inclusivo)
+**Importante:** Este es el "o" **inclusivo** — "P o Q o ambos". Es diferente del "o" exclusivo del español ("¿quieres café o té?" usualmente implica que solo puedes elegir uno).
 
-#### Implicación ($\rightarrow$)
+**Intuición:** "Apruebo si estudio O si tengo suerte" — apruebo si hago una cosa, la otra, o ambas.
+
+#### Implicación ($\rightarrow$): "SI...ENTONCES"
+
+Esta es la más confusa para muchos estudiantes:
 
 | $P$ | $Q$ | $P \rightarrow Q$ |
 |:---:|:---:|:-----------------:|
@@ -138,27 +193,36 @@ Las tablas de verdad definen la semántica de cada conectivo:
 | F | T | T |
 | F | F | T |
 
-**¡Importante!** La implicación es **verdadera por vacuidad** cuando el antecedente es falso.
+**¿Por qué la implicación es True cuando P es False?**
 
-:::example{title="Implicación Vacuamente Verdadera"}
+Esta es la pregunta más común. Pensemos en una promesa:
 
-"Si 2+2=5, entonces yo soy el Papa"
+*"Si sacas 10 en el examen, te compro un carro."*
 
-- $P$ = "2+2=5" = False
-- $Q$ = "yo soy el Papa" = False
+- Si sacas 10 y te compro el carro → Cumplí mi promesa ✓
+- Si sacas 10 y NO te compro el carro → Rompí mi promesa ✗
+- Si NO sacas 10... → No puedes acusarme de mentir ✓
 
-$P \rightarrow Q$ = **True** (¡la implicación es verdadera!)
+Cuando la condición (el antecedente) no se cumple, la promesa no se rompe. Esto se llama **verdad por vacuidad**.
 
-**Intuición:** Una promesa no se rompe si la condición nunca se cumple.
+:::example{title="Implicaciones Vacuamente Verdaderas"}
 
-"Si sacas 10, te compro un carro"
-- Si sacas 10 y te compro → Cumplí ✓
-- Si sacas 10 y NO te compro → Mentí ✗
-- Si NO sacas 10 → No puedes acusarme de mentir ✓
+Considera: "Si los cerdos vuelan, entonces 2+2=5"
+
+- $P$ = "Los cerdos vuelan" = **False**
+- $Q$ = "2+2=5" = **False**
+
+$P \rightarrow Q$ = **True**
+
+Esto parece raro, pero tiene sentido: como los cerdos NO vuelan, la condición nunca se activa, así que no podemos decir que la implicación sea falsa.
+
+**Otro ejemplo:** "Todos los unicornios son morados" es técnicamente verdadero porque no hay unicornios que puedan contradecirlo.
 
 :::
 
-#### Bicondicional ($\leftrightarrow$)
+#### Bicondicional ($\leftrightarrow$): "SI Y SOLO SI"
+
+El bicondicional es verdadero cuando ambos lados tienen el **mismo** valor:
 
 | $P$ | $Q$ | $P \leftrightarrow Q$ |
 |:---:|:---:|:---------------------:|
@@ -167,262 +231,258 @@ $P \rightarrow Q$ = **True** (¡la implicación es verdadera!)
 | F | T | F |
 | F | F | **T** |
 
-"Ambos tienen el mismo valor" (equivalencia)
+**Intuición:** "Apruebas si y solo si estudias" significa que aprobar y estudiar siempre van juntos — si haces uno, haces el otro; si no haces uno, no haces el otro.
 
 ---
 
-## Evaluando Fórmulas
+## Evaluando Fórmulas Complejas
 
-Para evaluar una fórmula en un modelo, aplicamos las tablas de verdad recursivamente.
+Para evaluar una fórmula en un modelo específico, aplicamos las tablas de verdad paso a paso, de adentro hacia afuera.
 
-:::example{title="Evaluación de Fórmula"}
+:::example{title="Evaluación Paso a Paso"}
 
-Evalúa $(P \land Q) \rightarrow \neg R$ en el modelo $m = \{P=T, Q=T, R=F\}$
+**Fórmula:** $(P \land Q) \rightarrow \neg R$
 
-**Paso a paso:**
+**Modelo:** $m = \{P = T, Q = T, R = F\}$
 
-1. $P = T$, $Q = T$, $R = F$
-2. $P \land Q = T \land T = T$
-3. $\neg R = \neg F = T$
-4. $(P \land Q) \rightarrow \neg R = T \rightarrow T = T$
+**Evaluación:**
 
-**Resultado:** True
+1. Sustituir valores: $(T \land T) \rightarrow \neg F$
+2. Evaluar $\neg F$: $(T \land T) \rightarrow T$
+3. Evaluar $T \land T$: $T \rightarrow T$
+4. Evaluar $T \rightarrow T$: $T$
+
+**Resultado:** La fórmula es **verdadera** en este modelo.
 
 :::
 
-### Tabla de Verdad Completa
+### Construyendo Tablas de Verdad Completas
 
-Para una fórmula con $n$ variables, construimos una tabla con $2^n$ filas:
+Para analizar una fórmula completamente, construimos una tabla con **todos** los modelos posibles.
 
-**Fórmula:** $(P \rightarrow Q) \land (\neg Q \rightarrow \neg P)$
+**Fórmula:** $P \rightarrow (P \lor Q)$
 
-| $P$ | $Q$ | $\neg P$ | $\neg Q$ | $P \rightarrow Q$ | $\neg Q \rightarrow \neg P$ | **Fórmula** |
-|:---:|:---:|:--------:|:--------:|:-----------------:|:---------------------------:|:-----------:|
-| T | T | F | F | T | T | **T** |
-| T | F | F | T | F | F | **F** |
-| F | T | T | F | T | T | **T** |
-| F | F | T | T | T | T | **T** |
+| $P$ | $Q$ | $P \lor Q$ | $P \rightarrow (P \lor Q)$ |
+|:---:|:---:|:----------:|:--------------------------:|
+| T | T | T | T |
+| T | F | T | T |
+| F | T | T | T |
+| F | F | F | T |
+
+**Observación:** La fórmula es **siempre verdadera** sin importar los valores de P y Q. A esto se le llama **tautología**.
 
 ---
 
 ## Equivalencias Lógicas
 
-Dos fórmulas son **lógicamente equivalentes** ($\equiv$) si tienen el mismo valor de verdad en **todos** los modelos.
+Dos fórmulas son **lógicamente equivalentes** (escritas como $\alpha \equiv \beta$) cuando tienen el **mismo valor de verdad en todos los modelos posibles**.
 
-### Equivalencias Fundamentales
+Esto significa que podemos sustituir una por otra sin cambiar el significado.
+
+### Las Equivalencias Más Importantes
 
 #### Leyes de De Morgan
 
+Estas leyes nos dicen cómo "distribuir" una negación sobre AND y OR:
+
 $$\neg (P \land Q) \equiv \neg P \lor \neg Q$$
+
+**Intuición:** "NO es cierto que (llueve Y hace frío)" es lo mismo que "NO llueve O NO hace frío".
+
 $$\neg (P \lor Q) \equiv \neg P \land \neg Q$$
 
-**Intuición:** "No ambos" = "al menos uno no"; "Ninguno" = "no el primero y no el segundo"
+**Intuición:** "NO es cierto que (llueve O hace frío)" es lo mismo que "NO llueve Y NO hace frío".
 
-#### Implicación como Disyunción
+#### La Implicación como Disyunción
+
+Esta equivalencia es **fundamental** y la usaremos constantemente:
 
 $$P \rightarrow Q \equiv \neg P \lor Q$$
 
-**Muy importante para resolución**
+**Intuición:** "Si llueve, me mojo" es lo mismo que "NO llueve O me mojo". 
 
-#### Contrapositiva
+Piénsalo así: la única forma de que la implicación sea falsa es que llueva ($P$ verdadero) y no me moje ($Q$ falso). En cualquier otro caso, es verdadera.
+
+#### La Contrapositiva
 
 $$P \rightarrow Q \equiv \neg Q \rightarrow \neg P$$
 
-"Si llueve, entonces la calle se moja" ≡ "Si la calle no está mojada, no llovió"
+**Intuición:** "Si llueve, la calle se moja" es equivalente a "Si la calle NO está mojada, NO llovió".
 
-#### Doble Negación
+Esta equivalencia es muy útil en demostraciones. Si quieres probar $P \rightarrow Q$, puedes probar su contrapositiva en su lugar.
 
-$$\neg \neg P \equiv P$$
+#### Otras Equivalencias Útiles
 
-#### Conmutatividad
-
-$$P \land Q \equiv Q \land P$$
-$$P \lor Q \equiv Q \lor P$$
-
-#### Asociatividad
-
-$$(P \land Q) \land R \equiv P \land (Q \land R)$$
-$$(P \lor Q) \lor R \equiv P \lor (Q \lor R)$$
-
-#### Distributividad
-
-$$P \land (Q \lor R) \equiv (P \land Q) \lor (P \land R)$$
-$$P \lor (Q \land R) \equiv (P \lor Q) \land (P \lor R)$$
-
-#### Bicondicional
-
-$$P \leftrightarrow Q \equiv (P \rightarrow Q) \land (Q \rightarrow P)$$
+| Nombre | Equivalencia |
+|--------|--------------|
+| Doble negación | $\neg \neg P \equiv P$ |
+| Conmutatividad | $P \land Q \equiv Q \land P$ y $P \lor Q \equiv Q \lor P$ |
+| Asociatividad | $(P \land Q) \land R \equiv P \land (Q \land R)$ |
+| Distributividad | $P \land (Q \lor R) \equiv (P \land Q) \lor (P \land R)$ |
+| Distributividad | $P \lor (Q \land R) \equiv (P \lor Q) \land (P \lor R)$ |
+| Bicondicional | $P \leftrightarrow Q \equiv (P \rightarrow Q) \land (Q \rightarrow P)$ |
 
 ---
 
-## Formas Normales
+## Formas Normales: Estandarizando Fórmulas
 
-Las **formas normales** son representaciones estandarizadas de fórmulas.
+Cualquier fórmula proposicional se puede reescribir en formas estandarizadas llamadas **formas normales**. Estas son útiles porque simplifican los algoritmos que procesan fórmulas.
 
-### Literal
+### Vocabulario Previo
 
-Un **literal** es un símbolo proposicional o su negación:
-- Literal positivo: $P$
-- Literal negativo: $\neg P$
+Antes de definir las formas normales, necesitamos algunos términos:
 
-### Cláusula
+**Literal:** Un símbolo proposicional o su negación.
+- Literales positivos: $P$, $Q$, $R$
+- Literales negativos: $\neg P$, $\neg Q$, $\neg R$
 
-Una **cláusula** es una disyunción de literales:
-$$L_1 \lor L_2 \lor \cdots \lor L_n$$
-
-**Ejemplo:** $P \lor \neg Q \lor R$
+**Cláusula:** Una disyunción (OR) de literales.
+- Ejemplo: $P \lor \neg Q \lor R$
+- Esto se lee: "P, o no-Q, o R"
 
 ### Forma Normal Conjuntiva (CNF)
 
-Una fórmula está en **CNF** si es una conjunción de cláusulas:
-$$(L_{11} \lor \cdots \lor L_{1k}) \land (L_{21} \lor \cdots \lor L_{2m}) \land \cdots$$
+Una fórmula está en **CNF** (Conjunctive Normal Form) si es una **conjunción de cláusulas** — es decir, cláusulas conectadas con AND.
+
+**Estructura:** (cláusula₁) $\land$ (cláusula₂) $\land$ ... $\land$ (cláusulaₙ)
 
 **Ejemplo en CNF:**
-$$(P \lor Q) \land (\neg P \lor R) \land (\neg Q \lor \neg R)$$
+$$(P \lor Q) \land (\neg P \lor R) \land (\neg Q \lor \neg R \lor S)$$
+
+Esto se lee: "P o Q, Y, no-P o R, Y, no-Q o no-R o S"
+
+**¿Por qué es importante CNF?**
+- Los algoritmos de SAT (satisfacibilidad) trabajan con CNF
+- El algoritmo de resolución requiere CNF
+- Es una forma "universal" — toda fórmula se puede convertir a CNF
 
 ### Forma Normal Disyuntiva (DNF)
 
-Una fórmula está en **DNF** si es una disyunción de conjunciones:
-$$(L_{11} \land \cdots \land L_{1k}) \lor (L_{21} \land \cdots \land L_{2m}) \lor \cdots$$
+Una fórmula está en **DNF** si es una **disyunción de conjunciones** — es decir, grupos de ANDs conectados con OR.
+
+**Estructura:** (conj₁) $\lor$ (conj₂) $\lor$ ... $\lor$ (conjₙ)
 
 **Ejemplo en DNF:**
-$$(P \land Q) \lor (\neg P \land R) \lor (Q \land \neg R)$$
+$$(P \land Q) \lor (\neg P \land R) \lor (Q \land \neg R \land S)$$
 
-### Conversión a CNF
+### Algoritmo para Convertir a CNF
 
-Algoritmo para convertir cualquier fórmula a CNF:
+Cualquier fórmula se puede convertir a CNF siguiendo estos pasos:
 
-1. **Eliminar bicondicionales:** $\alpha \leftrightarrow \beta$ → $(\alpha \rightarrow \beta) \land (\beta \rightarrow \alpha)$
-2. **Eliminar implicaciones:** $\alpha \rightarrow \beta$ → $\neg \alpha \lor \beta$
-3. **Mover negaciones hacia adentro** (De Morgan):
-   - $\neg(\alpha \land \beta)$ → $\neg \alpha \lor \neg \beta$
-   - $\neg(\alpha \lor \beta)$ → $\neg \alpha \land \neg \beta$
-   - $\neg \neg \alpha$ → $\alpha$
-4. **Distribuir** $\lor$ sobre $\land$:
-   - $\alpha \lor (\beta \land \gamma)$ → $(\alpha \lor \beta) \land (\alpha \lor \gamma)$
+**Paso 1:** Eliminar bicondicionales ($\leftrightarrow$)
+$$\alpha \leftrightarrow \beta \quad\Rightarrow\quad (\alpha \rightarrow \beta) \land (\beta \rightarrow \alpha)$$
 
-:::example{title="Conversión a CNF"}
+**Paso 2:** Eliminar implicaciones ($\rightarrow$)
+$$\alpha \rightarrow \beta \quad\Rightarrow\quad \neg \alpha \lor \beta$$
 
-Convertir: $P \rightarrow (Q \land R)$
+**Paso 3:** Mover negaciones hacia adentro (usando De Morgan)
+- $\neg(\alpha \land \beta) \Rightarrow \neg\alpha \lor \neg\beta$
+- $\neg(\alpha \lor \beta) \Rightarrow \neg\alpha \land \neg\beta$
+- $\neg\neg\alpha \Rightarrow \alpha$
 
-**Paso 1:** No hay bicondicionales
+**Paso 4:** Distribuir OR sobre AND
+$$\alpha \lor (\beta \land \gamma) \quad\Rightarrow\quad (\alpha \lor \beta) \land (\alpha \lor \gamma)$$
 
-**Paso 2:** Eliminar implicación
+:::example{title="Conversión a CNF Completa"}
+
+**Convertir:** $P \rightarrow (Q \land R)$
+
+**Paso 1:** No hay bicondicionales — nada que hacer.
+
+**Paso 2:** Eliminar la implicación
 $$\neg P \lor (Q \land R)$$
 
-**Paso 3:** Negaciones ya están bien
+**Paso 3:** Las negaciones ya están en los literales — nada que hacer.
 
 **Paso 4:** Distribuir $\lor$ sobre $\land$
 $$(\neg P \lor Q) \land (\neg P \lor R)$$
 
-**Resultado CNF:** $(\neg P \lor Q) \land (\neg P \lor R)$
+**Resultado:** Dos cláusulas: $(\neg P \lor Q)$ y $(\neg P \lor R)$
+
+**Verificación:** La fórmula original dice "si P, entonces Q y R". Las cláusulas dicen "no-P o Q" y "no-P o R", que es equivalente a "si P entonces Q" y "si P entonces R".
 
 :::
 
 ---
 
-## Cláusulas de Horn
+## Cláusulas de Horn: Un Caso Especial Importante
+
+Las **cláusulas de Horn** son un tipo especial de cláusula que tiene propiedades computacionales muy favorables.
+
+### Definición
 
 Una **cláusula de Horn** es una cláusula con **a lo más un literal positivo**.
 
-| Tipo | Forma | Ejemplo |
-|------|-------|---------|
-| **Cláusula definida** | Exactamente 1 positivo | $\neg P \lor \neg Q \lor R$ |
-| **Cláusula objetivo** | 0 positivos | $\neg P \lor \neg Q$ |
-| **Hecho** | 1 positivo, 0 negativos | $P$ |
+| Tipo | Literales Positivos | Ejemplo | Significado |
+|------|:-------------------:|---------|-------------|
+| **Hecho** | 1, ningún negativo | $P$ | "P es verdadero" |
+| **Regla** | 1 positivo, algunos negativos | $\neg P \lor \neg Q \lor R$ | "Si P y Q, entonces R" |
+| **Objetivo** | 0, todos negativos | $\neg P \lor \neg Q$ | "¿Es verdad P y Q?" |
 
-### Importancia de las Cláusulas de Horn
+### ¿Por qué son Importantes?
 
-Las cláusulas definidas se pueden escribir como **reglas**:
+Las cláusulas de Horn se pueden escribir como **reglas de producción** naturales:
 
-$$\neg P \lor \neg Q \lor R \equiv (P \land Q) \rightarrow R$$
+La cláusula $\neg A \lor \neg B \lor C$ es equivalente a:
+$$(A \land B) \rightarrow C$$
 
-"Si P y Q, entonces R"
+Que se lee: "Si A y B son verdaderos, entonces C es verdadero."
 
-**Ventaja computacional:** La inferencia con cláusulas de Horn es **O(n)** en lugar de NP-completo.
+**Ventaja computacional:** Mientras que determinar satisfacibilidad para fórmulas generales en CNF es un problema NP-completo (muy difícil), para cláusulas de Horn se puede resolver en **tiempo lineal** O(n). Esto hace que sean muy prácticas para sistemas basados en reglas.
 
 ---
 
 ## Ejercicios
 
-:::exercise{title="Tabla de Verdad" difficulty="1"}
+:::exercise{title="Construir Tabla de Verdad" difficulty="1"}
 
-Construye la tabla de verdad para: $\neg P \lor (P \land Q)$
+Construye la tabla de verdad completa para: $(P \rightarrow Q) \land (Q \rightarrow P)$
 
-| $P$ | $Q$ | $\neg P$ | $P \land Q$ | $\neg P \lor (P \land Q)$ |
-|:---:|:---:|:--------:|:-----------:|:------------------------:|
-| T | T | ? | ? | ? |
-| T | F | ? | ? | ? |
-| F | T | ? | ? | ? |
-| F | F | ? | ? | ? |
-
-¿Qué observas sobre esta fórmula?
+Pista: Esta fórmula tiene un nombre especial — ¿cuál es?
 
 :::
 
 <details>
 <summary><strong>Ver Solución</strong></summary>
 
-| $P$ | $Q$ | $\neg P$ | $P \land Q$ | $\neg P \lor (P \land Q)$ |
-|:---:|:---:|:--------:|:-----------:|:------------------------:|
-| T | T | F | T | **T** |
-| T | F | F | F | **F** |
-| F | T | T | F | **T** |
-| F | F | T | F | **T** |
+| $P$ | $Q$ | $P \rightarrow Q$ | $Q \rightarrow P$ | $(P \rightarrow Q) \land (Q \rightarrow P)$ |
+|:---:|:---:|:-----------------:|:-----------------:|:-------------------------------------------:|
+| T | T | T | T | **T** |
+| T | F | F | T | **F** |
+| F | T | T | F | **F** |
+| F | F | T | T | **T** |
 
-**Observación:** La fórmula es equivalente a $Q \lor \neg P$, o equivalentemente $P \rightarrow Q$.
+**Observación:** El patrón T, F, F, T es exactamente el mismo que el bicondicional $P \leftrightarrow Q$.
 
-Podemos verificar: ambas tienen el mismo patrón T, F, T, T.
+Esto confirma la equivalencia: $P \leftrightarrow Q \equiv (P \rightarrow Q) \land (Q \rightarrow P)$
+
+El bicondicional significa "P implica Q Y Q implica P", es decir, van siempre juntos.
 
 </details>
 
 ---
 
-:::exercise{title="Equivalencias" difficulty="2"}
+:::exercise{title="Demostrar Equivalencia" difficulty="2"}
 
-Demuestra usando tablas de verdad que:
+Usando tablas de verdad, demuestra que la contrapositiva es válida:
 
-$$P \rightarrow Q \equiv \neg P \lor Q$$
-
-:::
-
-<details>
-<summary><strong>Ver Solución</strong></summary>
-
-| $P$ | $Q$ | $P \rightarrow Q$ | $\neg P$ | $\neg P \lor Q$ |
-|:---:|:---:|:-----------------:|:--------:|:---------------:|
-| T | T | T | F | T |
-| T | F | F | F | F |
-| F | T | T | T | T |
-| F | F | T | T | T |
-
-Las columnas $P \rightarrow Q$ y $\neg P \lor Q$ son idénticas, por lo tanto son **lógicamente equivalentes**.
-
-</details>
-
----
-
-:::exercise{title="Conversión a CNF" difficulty="2"}
-
-Convierte a CNF: $(P \land Q) \rightarrow R$
+$$P \rightarrow Q \equiv \neg Q \rightarrow \neg P$$
 
 :::
 
 <details>
 <summary><strong>Ver Solución</strong></summary>
 
-**Paso 1:** Eliminar implicación
-$$\neg(P \land Q) \lor R$$
+| $P$ | $Q$ | $\neg P$ | $\neg Q$ | $P \rightarrow Q$ | $\neg Q \rightarrow \neg P$ |
+|:---:|:---:|:--------:|:--------:|:-----------------:|:---------------------------:|
+| T | T | F | F | T | T |
+| T | F | F | T | **F** | **F** |
+| F | T | T | F | T | T |
+| F | F | T | T | T | T |
 
-**Paso 2:** Aplicar De Morgan
-$$(\neg P \lor \neg Q) \lor R$$
+Las columnas de $P \rightarrow Q$ y $\neg Q \rightarrow \neg P$ son **idénticas**, lo que demuestra que son lógicamente equivalentes.
 
-**Paso 3:** Asociatividad (ya está en CNF)
-$$\neg P \lor \neg Q \lor R$$
-
-**Resultado:** Una sola cláusula: $(\neg P \lor \neg Q \lor R)$
-
-**Nota:** Esta es una cláusula de Horn (un literal positivo).
+**Intuición:** "Si estudias, apruebas" es lo mismo que "Si no apruebas, no estudiaste". Son dos formas de decir lo mismo.
 
 </details>
 
@@ -430,94 +490,131 @@ $$\neg P \lor \neg Q \lor R$$
 
 :::exercise{title="Formalización" difficulty="2"}
 
-Formaliza las siguientes afirmaciones en lógica proposicional:
+Traduce a lógica proposicional:
 
-1. "Si no estudias, reprobarás"
-2. "Aprobarás si y solo si estudias o tienes suerte"
-3. "No puedes tener la torta y comértela también"
+1. "Puedes votar si eres mayor de edad y estás registrado"
+2. "El semáforo está en verde o en rojo, pero no en ambos"
+3. "Llegaré tarde a menos que salga ahora"
 
-Define claramente tus símbolos proposicionales.
-
-:::
-
-<details>
-<summary><strong>Ver Solución</strong></summary>
-
-**Símbolos:**
-- $E$ = "Estudias"
-- $A$ = "Apruebas"
-- $S$ = "Tienes suerte"
-- $T$ = "Tienes la torta"
-- $C$ = "Te comes la torta"
-
-**Formalizaciones:**
-
-1. "Si no estudias, reprobarás" (reprobar = no aprobar)
-   $$\neg E \rightarrow \neg A$$
-   
-   Equivalente (contrapositiva): $A \rightarrow E$ ("Si apruebas, estudiaste")
-
-2. "Aprobarás si y solo si estudias o tienes suerte"
-   $$A \leftrightarrow (E \lor S)$$
-
-3. "No puedes tener la torta y comértela también"
-   $$\neg(T \land C)$$
-   
-   Equivalente: $\neg T \lor \neg C$
-
-</details>
-
----
-
-:::exercise{title="Identificación de Formas" difficulty="1"}
-
-Clasifica cada fórmula:
-
-| Fórmula | ¿CNF? | ¿DNF? | ¿Horn? |
-|---------|:-----:|:-----:|:------:|
-| $(P \lor Q) \land (\neg P \lor R)$ | ? | ? | ? |
-| $(P \land Q) \lor (R \land S)$ | ? | ? | ? |
-| $\neg P \lor \neg Q \lor R$ | ? | ? | ? |
-| $P \land Q \land R$ | ? | ? | ? |
+Define tus símbolos claramente.
 
 :::
 
 <details>
 <summary><strong>Ver Solución</strong></summary>
 
-| Fórmula | ¿CNF? | ¿DNF? | ¿Horn? |
-|---------|:-----:|:-----:|:------:|
-| $(P \lor Q) \land (\neg P \lor R)$ | ✓ Sí | ✗ No | ✗ No (2 positivos en cláusula 1) |
-| $(P \land Q) \lor (R \land S)$ | ✗ No | ✓ Sí | N/A |
-| $\neg P \lor \neg Q \lor R$ | ✓ Sí | ✗ No | ✓ Sí (1 positivo) |
-| $P \land Q \land R$ | ✓ Sí (cada var es cláusula) | ✓ Sí (1 conjunción) | ✓ Sí (hechos) |
+**1. "Puedes votar si eres mayor de edad y estás registrado"**
+
+Símbolos:
+- $V$ = "Puedes votar"
+- $M$ = "Eres mayor de edad"
+- $R$ = "Estás registrado"
+
+Fórmula: $(M \land R) \rightarrow V$
+
+*Nota: "si" introduce la condición suficiente. "Puedes votar SI..." significa que la condición implica poder votar.*
+
+**2. "El semáforo está en verde o en rojo, pero no en ambos"**
+
+Símbolos:
+- $V$ = "El semáforo está en verde"
+- $R$ = "El semáforo está en rojo"
+
+Fórmula: $(V \lor R) \land \neg(V \land R)$
+
+*Esta es la definición del OR exclusivo (XOR). En español, "o...pero no ambos" indica exclusividad.*
+
+**3. "Llegaré tarde a menos que salga ahora"**
+
+Símbolos:
+- $T$ = "Llegaré tarde"
+- $S$ = "Salgo ahora"
+
+"A menos que" es complicado. Significa "si no":
+- "Llegaré tarde a menos que salga" = "Si no salgo, llegaré tarde"
+
+Fórmula: $\neg S \rightarrow T$
+
+Equivalente: $S \lor T$ (o salgo ahora, o llego tarde, o ambos)
 
 </details>
 
 ---
 
-:::prompt{title="Practicar Lógica Proposicional" for="Claude/ChatGPT"}
+:::exercise{title="Conversión a CNF" difficulty="2"}
 
-Quiero practicar lógica proposicional. Por favor:
+Convierte a CNF: $(P \lor Q) \rightarrow R$
 
-1. Dame 5 ejercicios de tablas de verdad con fórmulas de 2-3 variables
-2. Dame 3 ejercicios de conversión a CNF
-3. Dame 2 problemas de formalización (del mundo real a lógica)
-4. Después de que intente resolverlos, dame retroalimentación detallada
-
-Empieza con los ejercicios de tablas de verdad.
+Muestra cada paso del proceso.
 
 :::
+
+<details>
+<summary><strong>Ver Solución</strong></summary>
+
+**Fórmula original:** $(P \lor Q) \rightarrow R$
+
+**Paso 1:** No hay bicondicionales.
+
+**Paso 2:** Eliminar implicación ($\alpha \rightarrow \beta \Rightarrow \neg\alpha \lor \beta$)
+$$\neg(P \lor Q) \lor R$$
+
+**Paso 3:** Mover negación hacia adentro (De Morgan: $\neg(P \lor Q) \Rightarrow \neg P \land \neg Q$)
+$$(\neg P \land \neg Q) \lor R$$
+
+**Paso 4:** Distribuir OR sobre AND
+$$(\neg P \lor R) \land (\neg Q \lor R)$$
+
+**Resultado en CNF:** $(\neg P \lor R) \land (\neg Q \lor R)$
+
+Dos cláusulas:
+1. $\neg P \lor R$
+2. $\neg Q \lor R$
+
+**Verificación:** La fórmula original dice "Si P o Q, entonces R". Las cláusulas dicen "Si P entonces R" y "Si Q entonces R", que es lo mismo.
+
+</details>
+
+---
+
+:::exercise{title="Identificar Cláusulas de Horn" difficulty="1"}
+
+¿Cuáles de estas cláusulas son cláusulas de Horn?
+
+1. $P \lor Q \lor R$
+2. $\neg P \lor \neg Q \lor R$
+3. $\neg P \lor \neg Q$
+4. $P$
+5. $\neg P \lor Q \lor R$
+
+:::
+
+<details>
+<summary><strong>Ver Solución</strong></summary>
+
+Recuerda: Una cláusula de Horn tiene **a lo más un literal positivo**.
+
+| Cláusula | Literales Positivos | ¿Es Horn? |
+|----------|:-------------------:|:---------:|
+| $P \lor Q \lor R$ | 3 (P, Q, R) | ✗ No |
+| $\neg P \lor \neg Q \lor R$ | 1 (R) | ✓ Sí — es una regla |
+| $\neg P \lor \neg Q$ | 0 | ✓ Sí — es un objetivo |
+| $P$ | 1 (P) | ✓ Sí — es un hecho |
+| $\neg P \lor Q \lor R$ | 2 (Q, R) | ✗ No |
+
+Las cláusulas 2, 3 y 4 son de Horn.
+
+</details>
 
 ---
 
 ## Puntos Clave
 
-1. **Proposición** = declaración verdadera o falsa
-2. **Sintaxis** = reglas gramaticales (qué expresiones son válidas)
-3. **Semántica** = significado (cuándo son verdaderas)
-4. **Conectivos**: $\neg, \land, \lor, \rightarrow, \leftrightarrow$
-5. **Implicación** es verdadera cuando el antecedente es falso (vacuamente verdadera)
-6. **Equivalencias** importantes: De Morgan, contrapositiva, $P \rightarrow Q \equiv \neg P \lor Q$
-7. **CNF** = conjunción de cláusulas (importante para SAT)
-8. **Cláusulas de Horn** permiten inferencia eficiente
+1. Una **proposición** es una oración que es verdadera o falsa, no ambas
+2. La **sintaxis** define qué fórmulas están bien formadas
+3. La **semántica** define cuándo las fórmulas son verdaderas (usando modelos)
+4. Los **conectivos** ($\neg$, $\land$, $\lor$, $\rightarrow$, $\leftrightarrow$) combinan proposiciones
+5. La **implicación** es verdadera cuando el antecedente es falso (verdad por vacuidad)
+6. Las **equivalencias** permiten reescribir fórmulas: De Morgan, contrapositiva, $P \rightarrow Q \equiv \neg P \lor Q$
+7. **CNF** (conjunción de cláusulas) es la forma estándar para algoritmos
+8. Las **cláusulas de Horn** permiten inferencia eficiente en tiempo lineal
