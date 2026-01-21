@@ -81,32 +81,44 @@ $$\alpha \models \beta \iff M(\alpha) \subseteq M(\beta)$$
 
 **Conclusión:** El entailment es **unidireccional** — no funciona al revés.
 
-### Entailment vs. Implicación Lógica
+## Tres Distinciones Fundamentales
 
-**¡CUIDADO!** Hay una distinción crucial que a menudo confunde:
+Antes de continuar, debemos aclarar tres confusiones comunes sobre el símbolo $\models$ y conceptos relacionados.
 
-| Aspecto | **Entailment** | **Implicación** |
+### 1. Entailment ($\models$) vs. Implicación ($\rightarrow$)
+
+**Esta es probablemente la confusión más frecuente en lógica.** Parecen similares pero operan en niveles completamente diferentes:
+
+| Aspecto | **Entailment** ($\models$) | **Implicación** ($\rightarrow$) |
 |---------|----------------|-----------------|
-| **Símbolo** | $\models$ | $\rightarrow$ |
 | **Naturaleza** | Relación META-lógica | Conectivo lógico |
-| **Nivel** | Afirmación SOBRE fórmulas | Una fórmula EN SÍ MISMA |
-| **¿Qué es?** | Relación entre fórmulas | Una fórmula |
-| **¿Tiene valor de verdad?** | NO (es cierto o no) | SÍ (T/F en cada modelo) |
-| **Se evalúa** | Sobre TODOS los modelos | En CADA modelo individualmente |
+| **Nivel** | Afirmación SOBRE fórmulas | Una fórmula dentro del lenguaje |
+| **¿Qué es?** | Relación entre fórmulas | Una fórmula que puedes evaluar |
+| **¿Tiene valor de verdad?** | NO (es cierto o falso como afirmación) | SÍ (TRUE/FALSE en cada modelo) |
+| **Se evalúa** | Considerando TODOS los modelos | En CADA modelo individualmente |
 
-#### Ejemplo Contrastante
+#### Analogía
+
+Piensa en la diferencia entre:
+1. **"2 + 2 = 4"** — una afirmación matemática sobre números
+2. **"4"** — un número en sí mismo
+
+- **Entailment** es como (1): una afirmación metalógica sobre fórmulas
+- **Implicación** es como (2): un objeto (fórmula) dentro del sistema lógico
+
+#### Ejemplo Lado a Lado
+
+Consideremos $P \land Q$ y $P$:
 
 **Entailment:** $P \land Q \models P$
-
-- Esto es una **afirmación metalógica**
+- Esta es una **afirmación metalógica** (vive "fuera" de la lógica)
 - Pregunta: "¿En todos los modelos donde $P \land Q$ es TRUE, $P$ también es TRUE?"
-- Respuesta: Sí ✓ (es una afirmación cierta)
-- **No puedes** evaluar esto en un modelo específico — es una pregunta sobre TODOS los modelos
+- Se verifica examinando la relación entre conjuntos de modelos: $M(P \land Q) \subseteq M(P)$?
+- Respuesta: **Cierta** ✓
 
 **Implicación:** $(P \land Q) \rightarrow P$
-
-- Esto es una **fórmula proposicional**
-- Puedes evaluarla en cada modelo:
+- Esta es una **fórmula** (vive "dentro" de la lógica)
+- Se puede evaluar en cada modelo:
 
 | Modelo | $P$ | $Q$ | $P \land Q$ | $(P \land Q) \rightarrow P$ |
 |:------:|:---:|:---:|:-----------:|:---------------------------:|
@@ -115,94 +127,124 @@ $$\alpha \models \beta \iff M(\alpha) \subseteq M(\beta)$$
 | m₃ | F | T | F | $F \rightarrow F = \mathbf{T}$ |
 | m₄ | F | F | F | $F \rightarrow F = \mathbf{T}$ |
 
-La fórmula $(P \land Q) \rightarrow P$ es TRUE en todos los modelos → es una **tautología**.
+- La fórmula es TRUE en todos los modelos → es una **tautología**
 
-#### El Teorema de Deducción: Conectando Ambos Conceptos
+#### El Teorema de Deducción: El Puente Entre Ambos
 
 Existe una conexión profunda entre entailment e implicación:
 
-$$\alpha \models \beta \quad\text{si y solo si}\quad \models (\alpha \rightarrow \beta)$$
+$$\boxed{\alpha \models \beta \quad\Longleftrightarrow\quad \models (\alpha \rightarrow \beta)}$$
 
-**En palabras:** "α implica lógicamente β" (metalenguaje) es cierto **si y solo si** "la fórmula α→β es una tautología" (lenguaje objeto).
+**En palabras:** "α implica lógicamente β" (metalenguaje) es cierto **si y solo si** "la fórmula α→β es una tautología".
 
-**Nota importante:** El símbolo $\models$ aparece dos veces pero con significados ligeramente diferentes:
+**Nota sobre notación:** El símbolo $\models$ aparece de dos formas:
 - $\alpha \models \beta$ — "α implica lógicamente β"
-- $\models (\alpha \rightarrow \beta)$ — "la fórmula α→β es válida/tautología" (es TRUE en todos los modelos)
+- $\models (\alpha \rightarrow \beta)$ — "la fórmula α→β es válida" (abreviación de: es TRUE en todos los modelos)
 
-#### Analogía
+#### Pregunta Común: ¿Puede Haber Implicación Sin Entailment?
 
-Piensa en la diferencia entre:
-1. **"La suma 2 + 2 = 4"** — una afirmación matemática (cierta o falsa)
-2. **"El número 4"** — un objeto matemático
+**Respuesta:** Depende de qué entendamos por "haber implicación":
 
-- **Entailment** ($\models$) es como (1): una afirmación sobre la relación entre fórmulas
-- **Implicación** ($\rightarrow$) es como (2): un objeto (fórmula) dentro del sistema lógico
+**Caso 1:** ¿Puede la fórmula α→β ser TRUE en algunos modelos aunque α⊭β?
+- **SÍ.** La fórmula puede ser verdadera en ciertos modelos sin ser tautología.
 
-### Entailment vs. Equivalencia Lógica
+**Caso 2:** ¿Puede α→β ser tautología sin que α⊨β?
+- **NO.** Por el Teorema de Deducción, son equivalentes.
 
-También es crucial distinguir entre implicación unidireccional y equivalencia:
+**Ejemplo ilustrativo:** $P \not\models Q$ (no hay entailment)
+
+Evaluemos la fórmula $P \rightarrow Q$:
+
+| Modelo | $P$ | $Q$ | $P \rightarrow Q$ |
+|:------:|:---:|:---:|:-----------------:|
+| m₁ | T | T | $T \rightarrow T = \mathbf{T}$ ✓ |
+| m₂ | T | F | $T \rightarrow F = \mathbf{F}$ ❌ |
+| m₃ | F | T | $F \rightarrow T = \mathbf{T}$ ✓ |
+| m₄ | F | F | $F \rightarrow F = \mathbf{T}$ ✓ |
+
+- ✗ NO hay entailment: $P \not\models Q$ (en m₂, P es TRUE pero Q es FALSE)
+- ✓ La fórmula $P \rightarrow Q$ **sí puede ser TRUE** (lo es en m₁, m₃, m₄)
+- ✗ PERO $P \rightarrow Q$ **NO es tautología** (es FALSE en m₂)
+
+**Conclusión:** La fórmula de implicación puede existir y ser verdadera en algunos modelos, pero el entailment solo ocurre cuando es verdadera en **todos** los modelos.
+
+---
+
+### 2. Entailment ($\models$) vs. Equivalencia ($\equiv$)
+
+El entailment es **unidireccional**. La equivalencia requiere ambas direcciones:
 
 | Concepto | Notación | Significado | Bidireccional |
 |----------|----------|-------------|---------------|
 | **Entailment** | $\alpha \models \beta$ | Si α es TRUE, entonces β debe ser TRUE | ❌ NO |
 | **Equivalencia** | $\alpha \equiv \beta$ | α y β son TRUE en exactamente los mismos modelos | ✅ SÍ |
-| **Bicondicional** | $\alpha \leftrightarrow \beta$ | Fórmula que es TRUE cuando α y β tienen el mismo valor | (es una fórmula) |
 
-**Definición formal de equivalencia:**
-$$\alpha \equiv \beta \quad\text{si y solo si}\quad M(\alpha) = M(\beta)$$
+**Definición formal:**
+$$\alpha \equiv \beta \quad\Longleftrightarrow\quad M(\alpha) = M(\beta) \quad\Longleftrightarrow\quad (\alpha \models \beta) \land (\beta \models \alpha)$$
 
-Equivalentemente:
-$$\alpha \equiv \beta \quad\text{si y solo si}\quad (\alpha \models \beta) \text{ Y } (\beta \models \alpha)$$
+#### Conexión con el Bicondicional
 
-**Teorema de equivalencia:**
-$$\alpha \equiv \beta \quad\text{si y solo si}\quad \models (\alpha \leftrightarrow \beta)$$
+Similar al Teorema de Deducción, existe un teorema para equivalencia:
 
-Es decir, dos fórmulas son equivalentes si y solo si su bicondicional es una tautología.
+$$\boxed{\alpha \equiv \beta \quad\Longleftrightarrow\quad \models (\alpha \leftrightarrow \beta)}$$
 
-**Ejemplos:**
+**En palabras:** Dos fórmulas son equivalentes si y solo si su bicondicional es una tautología.
 
-- $P \land Q \equiv Q \land P$ (conmutatividad — son equivalentes)
-  - $M(P \land Q) = M(Q \land P) = \{m_1\}$
-  - La fórmula $(P \land Q) \leftrightarrow (Q \land P)$ es una tautología
-  
-- $P \lor Q \equiv \neg(\neg P \land \neg Q)$ (ley de De Morgan — equivalentes)
-  - La fórmula $(P \lor Q) \leftrightarrow \neg(\neg P \land \neg Q)$ es una tautología
-  
-- $P \land Q \not\equiv P$ (NO son equivalentes)
-  - $M(P \land Q) = \{m_1\} \neq \{m_1, m_2\} = M(P)$
-  - Pero sí hay entailment unidireccional: $P \land Q \models P$
-  - La fórmula $(P \land Q) \rightarrow P$ es una tautología
-  - Pero $(P \land Q) \leftrightarrow P$ NO es una tautología (es falsa en m₂)
+#### Ejemplos Comparativos
+
+| Caso | Entailment | Equivalencia | Explicación |
+|------|------------|--------------|-------------|
+| $P \land Q$ vs. $P$ | $P \land Q \models P$ ✓ | $P \land Q \not\equiv P$ ✗ | Unidireccional: conjunción implica cada conjunto, pero no al revés |
+| $P \land Q$ vs. $Q \land P$ | Ambos $\models$ al otro ✓ | $P \land Q \equiv Q \land P$ ✓ | Equivalentes: mismo conjunto de modelos |
+| $P \lor Q$ vs. $\neg(\neg P \land \neg Q)$ | Ambos $\models$ al otro ✓ | $P \lor Q \equiv \neg(\neg P \land \neg Q)$ ✓ | Ley de De Morgan |
+
+**Resumen:**
+- $(P \land Q) \rightarrow P$ es **tautología** (entailment existe)
+- $(P \land Q) \leftrightarrow P$ **NO es tautología** (no son equivalentes)
+- $(P \land Q) \leftrightarrow (Q \land P)$ **es tautología** (son equivalentes)
 
 ---
 
-## La Diferencia entre Entailment e Inferencia
+### 3. Entailment ($\models$) vs. Inferencia/Derivación ($\vdash$)
 
-Es importante distinguir entre dos conceptos relacionados pero diferentes:
+Finalmente, debemos distinguir entre **verdad semántica** y **derivación sintáctica**:
 
 | Concepto | Símbolo | Naturaleza | Pregunta que responde |
 |----------|:-------:|------------|----------------------|
-| **Entailment** | $\models$ | Semántica (verdad) | ¿Es $\beta$ verdadera siempre que $\alpha$ lo es? |
-| **Derivación/Inferencia** | $\vdash$ | Sintáctica (proceso) | ¿Puedo derivar $\beta$ aplicando reglas a $\alpha$? |
+| **Entailment** | $\models$ | Semántica (verdad en modelos) | ¿Es $\beta$ verdadera siempre que $\alpha$ lo es? |
+| **Derivación** | $\vdash$ | Sintáctica (manipulación simbólica) | ¿Puedo derivar $\beta$ aplicando reglas a $\alpha$? |
 
-- **Entailment** es una relación sobre la **verdad** — existe independientemente de nosotros.
-- **Inferencia** es un **proceso** que ejecutamos — aplicamos reglas mecánicamente.
+**Diferencia clave:**
+- **Entailment** es una **relación sobre la verdad** — existe independientemente de nosotros, basada en la semántica de los modelos.
+- **Derivación** es un **proceso computacional** — aplicamos reglas mecánicamente, manipulando símbolos.
 
-### Propiedades de un Buen Sistema de Inferencia
+**Ejemplo:**
+- $P, P \rightarrow Q \models Q$ — afirma que en todos los modelos donde P y P→Q son TRUE, Q también lo es
+- $P, P \rightarrow Q \vdash Q$ — afirma que podemos derivar Q aplicando Modus Ponens
 
-Un algoritmo de inferencia es bueno si tiene estas propiedades:
+#### ¿Cuándo Coinciden? Propiedades de un Sistema de Inferencia
 
-**Soundness (Correctitud):** Si puedo derivarlo, es verdad.
+Un sistema de inferencia es **bueno** cuando la derivación sintáctica ($\vdash$) coincide con la verdad semántica ($\models$). Esto requiere dos propiedades fundamentales:
+
+**1. Soundness (Correctitud):** Si puedes derivarlo, es verdad.
+
 $$\text{Si } \alpha \vdash \beta \text{, entonces } \alpha \models \beta$$
 
-Un sistema sound nunca te da una conclusión falsa.
+Un sistema **sound** nunca produce conclusiones falsas. Es **confiable** — todo lo que deriva es semánticamente válido.
 
-**Completeness (Completitud):** Si es verdad, puedo derivarlo.
+**2. Completeness (Completitud):** Si es verdad, puedes derivarlo.
+
 $$\text{Si } \alpha \models \beta \text{, entonces } \alpha \vdash \beta$$
 
-Un sistema complete puede encontrar todas las verdades.
+Un sistema **complete** puede encontrar todas las verdades. Es **potente** — no se "pierde" ninguna consecuencia lógica válida.
 
-**El ideal:** Un sistema que sea **sound Y complete**. Afortunadamente, para lógica proposicional existen tales sistemas.
+**El ideal:** Un sistema que sea **sound Y complete**.
+
+$$\alpha \vdash \beta \quad\Longleftrightarrow\quad \alpha \models \beta$$
+
+Cuando ambas propiedades se cumplen, la derivación sintáctica y la verdad semántica son **equivalentes**.
+
+**Buenas noticias:** Para lógica proposicional, existen sistemas de inferencia que son sound Y complete (por ejemplo, resolución, tableaux semánticos, deducción natural).
 
 ```mermaid
 graph LR
