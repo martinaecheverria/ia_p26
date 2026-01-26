@@ -547,7 +547,7 @@ $$\phi = (P) \land (\neg P \lor Q) \land (R \lor \neg Q) \land (\neg R \lor S \l
 - **Asignación:** $\alpha = \{P \mapsto T, Q \mapsto T\}$
 - **Simplificación:**
   - Cláusula 1: $(Q)$ → **TRUE** (eliminar)
-  - Cláusula 2: $(R \lor \neg Q)$ → $(R \lor F)$ → $(R)$ ← **nueva unitaria**
+  - Cláusula 2: $(R \lor \neg Q)$ → $(R \lor F)$ → $( R )$ ← **nueva unitaria**
   - Cláusula 3: sin cambios
 - **Fórmula resultante:**
   $$\phi_2 = (R) \land (\neg R \lor S \lor T)$$
