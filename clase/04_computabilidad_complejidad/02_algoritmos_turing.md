@@ -96,88 +96,178 @@ Se lee: "Estando en estado $q$ y leyendo símbolo $a$, escribo $b$, me muevo en 
 
 ## Ejemplo 1: Reconocer el Lenguaje $\{0^n1^n \mid n \geq 0\}$
 
-**Problema:** Aceptar cadenas como "01", "0011", "000111" y rechazar "00" "011", "01010".
+**Problema:** Aceptar cadenas como "", "01", "0011", "000111" y rechazar "0", "1", "00", "011", "0110".
 
 **Estrategia:**
-1. Marcar un 0, marcar un 1
-2. Repetir hasta que no queden símbolos sin marcar
-3. Si todo coincide → aceptar; si no → rechazar
+1. Marcar un 0 con X
+2. Ir a la derecha y marcar el primer 1 sin marcar con Y
+3. Regresar al inicio
+4. Repetir hasta que no queden 0s
+5. Verificar que no queden 1s sin marcar
 
-**Descripción informal:**
+**Descripción de estados:**
 
 ```
-Estado q₀ (inicio):
+Estado q₀ (buscar siguiente 0 sin marcar):
   - Si veo 0 → escribo X, muevo R, voy a q₁
-  - Si veo X → muevo R, quedo en q₀ (saltar Xs)
-  - Si veo □ → acepto (cadena vacía)
+  - Si veo X → muevo R, quedo en q₀ (saltar Xs ya marcadas)
+  - Si veo Y → voy a q₃ (ya no hay 0s, verificar que no sobren 1s)
+  - Si veo □ → acepto (cadena vacía, o todos emparejados)
   
 Estado q₁ (buscar el 1 correspondiente):
-  - Si veo 0 o X → muevo R, quedo en q₁
-  - Si veo 1 → escribo Y, muevo L, voy a q₂
-  - Si veo □ → rechazo (faltan 1s)
+  - Si veo 0 → muevo R, quedo en q₁ (saltar 0s)
+  - Si veo Y → muevo R, quedo en q₁ (saltar 1s ya marcados)
+  - Si veo 1 → escribo Y, muevo L, voy a q₂ (¡encontré el 1!)
+  - Si veo □ → rechazo (más 0s que 1s)
   
-Estado q₂ (regresar al inicio):
+Estado q₂ (regresar al inicio para buscar otro 0):
   - Si veo 0, X, Y → muevo L, quedo en q₂
-  - Si veo □ → muevo R, voy a q₀
+  - Si veo □ → muevo R, voy a q₀ (llegué al inicio)
   
-Estado q₃ (verificar que solo quedan Ys):
-  - Si veo Y → muevo R, quedo en q₃
-  - Si veo □ → acepto
-  - Cualquier otra cosa → rechazo
+Estado q₃ (verificar que solo quedan Ys y blancos):
+  - Si veo Y → muevo R, quedo en q₃ (bien, sigo verificando)
+  - Si veo □ → acepto (no sobran 1s sin marcar)
+  - Si veo 1 → rechazo (más 1s que 0s)
 ```
 
-**Ejecución en "0011":**
+**Ejecución detallada en "0011":**
+
+Usamos la notación: `Estado | Cinta con [cabezal]`
 
 ```
-Paso 0: q₀  [0]011      (lee 0)
-Paso 1: Xq₁  0[1]1      (marcó X, busca 1)
-Paso 2: Xq₁  01[1]      (sigue buscando)
-Paso 3: X0q₂  Y[1]      (marcó Y, regresa)
-Paso 4: Xq₂ [0]Y1       (regresando)
-Paso 5: q₂ [X]0Y1       (regresando)
-Paso 6: □q₀ X[0]Y1      (de vuelta al inicio)
-Paso 7: □Xq₁ [0]Y1      (salta X, busca siguiente 0)
-Paso 8: □XXq₁ Y[1]      (encontró Y, sigue)
-Paso 9: □XXq₁ YY[□]     (encontró 1, lo marca)
-... (similar, marca el último 1)
-... llegamos a: □XXYY□
-Paso N: acepta ✓
+Paso  0: q₀ | [0] 0  1  1  □     Lee 0 → Escribe X, mueve R, va a q₁
+Paso  1: q₁ |  X [0] 1  1  □     Lee 0 → Mueve R (saltando 0)
+Paso  2: q₁ |  X  0 [1] 1  □     Lee 1 → Escribe Y, mueve L, va a q₂
+Paso  3: q₂ |  X [0] Y  1  □     Lee 0 → Mueve L (regresando)
+Paso  4: q₂ | [X] 0  Y  1  □     Lee X → Mueve L (regresando)
+Paso  5: q₂ |[□] X  0  Y  1      Lee □ → Mueve R, va a q₀ (inicio!)
+Paso  6: q₀ | □ [X] 0  Y  1      Lee X → Mueve R (saltar X)
+Paso  7: q₀ | □  X [0] Y  1      Lee 0 → Escribe X, mueve R, va a q₁
+Paso  8: q₁ | □  X  X [Y] 1      Lee Y → Mueve R (saltar Y marcada)
+Paso  9: q₁ | □  X  X  Y [1]     Lee 1 → Escribe Y, mueve L, va a q₂
+Paso 10: q₂ | □  X  X [Y] Y      Lee Y → Mueve L (regresando)
+Paso 11: q₂ | □  X [X] Y  Y      Lee X → Mueve L (regresando)
+Paso 12: q₂ | □ [X] X  Y  Y      Lee X → Mueve L (regresando)
+Paso 13: q₂ |[□] X  X  Y  Y      Lee □ → Mueve R, va a q₀ (inicio!)
+Paso 14: q₀ | □ [X] X  Y  Y      Lee X → Mueve R (saltar)
+Paso 15: q₀ | □  X [X] Y  Y      Lee X → Mueve R (saltar)
+Paso 16: q₀ | □  X  X [Y] Y      Lee Y → Va a q₃ (verificar!)
+Paso 17: q₃ | □  X  X  Y [Y]     Lee Y → Mueve R (bien)
+Paso 18: q₃ | □  X  X  Y  Y [□]  Lee □ → ¡ACEPTA! ✓
 ```
 
-**Conclusión:** La cadena "0011" es aceptada.
+**Conclusión:** "0011" tiene 2 ceros y 2 unos, correctamente emparejados.
+
+---
+
+**Ejecución en cadena inválida "011":**
+
+```
+Paso 0: q₀ | [0] 1  1  □     Lee 0 → Escribe X, mueve R, va a q₁
+Paso 1: q₁ |  X [1] 1  □     Lee 1 → Escribe Y, mueve L, va a q₂
+Paso 2: q₂ | [X] Y  1  □     Lee X → Mueve L
+Paso 3: q₂ |[□] X  Y  1      Lee □ → Mueve R, va a q₀
+Paso 4: q₀ | □ [X] Y  1      Lee X → Mueve R
+Paso 5: q₀ | □  X [Y] 1      Lee Y → Va a q₃ (verificar)
+Paso 6: q₃ | □  X  Y [1]     Lee 1 → ¡RECHAZA! ✗
+```
+
+**Conclusión:** "011" tiene más 1s que 0s, es rechazada.
+
+---
+
+**Ejecución en cadena inválida "001":**
+
+```
+Paso 0: q₀ | [0] 0  1  □     Lee 0 → Escribe X, mueve R, va a q₁
+Paso 1: q₁ |  X [0] 1  □     Lee 0 → Mueve R
+Paso 2: q₁ |  X  0 [1] □     Lee 1 → Escribe Y, mueve L, va a q₂
+Paso 3: q₂ |  X [0] Y  □     Lee 0 → Mueve L
+Paso 4: q₂ | [X] 0  Y  □     Lee X → Mueve L
+Paso 5: q₂ |[□] X  0  Y      Lee □ → Mueve R, va a q₀
+Paso 6: q₀ | □ [X] 0  Y      Lee X → Mueve R
+Paso 7: q₀ | □  X [0] Y      Lee 0 → Escribe X, mueve R, va a q₁
+Paso 8: q₁ | □  X  X [Y]     Lee Y → Mueve R
+Paso 9: q₁ | □  X  X  Y [□]  Lee □ → ¡RECHAZA! ✗ (no hay más 1s)
+```
+
+**Conclusión:** "001" tiene más 0s que 1s, es rechazada.
 
 ---
 
 ## Ejemplo 2: Sumar 1 a un Número Binario
 
-**Problema:** Entrada "1011" (11 en decimal) → Salida "1100" (12 en decimal)
+**Problema:** Dado un número binario, sumarle 1.
+- Entrada "1011" (11 en decimal) → Salida "1100" (12 en decimal)
+- Entrada "111" (7 en decimal) → Salida "1000" (8 en decimal)
 
-**Estrategia:** Ir al final, sumar 1, propagar el acarreo.
+**Estrategia:** Ir al final del número, luego sumar 1 propagando el acarreo hacia la izquierda.
 
-**Descripción informal:**
-
-```
-q₀: Mover a la derecha hasta encontrar el blanco
-q₁: Empezar a sumar desde el dígito menos significativo
-    - Si veo 1 → escribo 0, muevo L (acarreo)
-    - Si veo 0 → escribo 1, acepto (sin acarreo)
-    - Si veo □ → escribo 1, acepto (acarreo al inicio)
-```
-
-**Ejecución en "1011":**
+**Descripción de estados:**
 
 ```
-Paso 0: q₀ [1]011       (moverse al final)
-Paso 1: q₀ 1[0]11
-Paso 2: q₀ 10[1]1
-Paso 3: q₀ 101[1]
-Paso 4: q₀ 1011[□]      (fin de cadena)
-Paso 5: q₁ 101[1]       (sumar 1)
-Paso 6: q₁ 10[1]0       (acarreo: 1+1=10)
-Paso 7: q₁ 1[0]00       (acarreo: 1+1=10)
-Paso 8: q₁ [1]100       (sin acarreo: 0+1=1)
-Resultado: 1100 ✓
+Estado q₀ (ir al final del número):
+  - Si veo 0 o 1 → muevo R, quedo en q₀
+  - Si veo □ → muevo L, voy a q₁ (encontré el final)
+
+Estado q₁ (sumar con acarreo):
+  - Si veo 1 → escribo 0, muevo L, quedo en q₁ (1+1=10, acarreo continúa)
+  - Si veo 0 → escribo 1, voy a q_accept (0+1=1, sin acarreo, terminamos)
+  - Si veo □ → escribo 1, voy a q_accept (acarreo al inicio, añadir dígito)
 ```
+
+**Ejecución detallada en "1011" (11₁₀):**
+
+```
+Paso 0: q₀ | [1] 0  1  1  □     Lee 1 → Mueve R
+Paso 1: q₀ |  1 [0] 1  1  □     Lee 0 → Mueve R
+Paso 2: q₀ |  1  0 [1] 1  □     Lee 1 → Mueve R
+Paso 3: q₀ |  1  0  1 [1] □     Lee 1 → Mueve R
+Paso 4: q₀ |  1  0  1  1 [□]    Lee □ → Mueve L, va a q₁ (¡encontró el final!)
+Paso 5: q₁ |  1  0  1 [1] □     Lee 1 → Escribe 0, mueve L (acarreo: 1+1=10)
+Paso 6: q₁ |  1  0 [1] 0  □     Lee 1 → Escribe 0, mueve L (acarreo: 1+1=10)
+Paso 7: q₁ |  1 [0] 0  0  □     Lee 0 → Escribe 1, va a q_accept (sin acarreo: 0+1=1)
+
+Resultado final: 1100 ✓ (que es 12 en decimal)
+```
+
+**Verificación:** 1011₂ = 8+2+1 = 11₁₀, y 1100₂ = 8+4 = 12₁₀ ✓
+
+---
+
+**Ejecución en "111" (7₁₀) — caso con overflow:**
+
+```
+Paso 0: q₀ | [1] 1  1  □     Lee 1 → Mueve R
+Paso 1: q₀ |  1 [1] 1  □     Lee 1 → Mueve R
+Paso 2: q₀ |  1  1 [1] □     Lee 1 → Mueve R
+Paso 3: q₀ |  1  1  1 [□]    Lee □ → Mueve L, va a q₁
+Paso 4: q₁ |  1  1 [1] □     Lee 1 → Escribe 0, mueve L (acarreo)
+Paso 5: q₁ |  1 [1] 0  □     Lee 1 → Escribe 0, mueve L (acarreo)
+Paso 6: q₁ | [1] 0  0  □     Lee 1 → Escribe 0, mueve L (acarreo)
+Paso 7: q₁ |[□] 0  0  0      Lee □ → Escribe 1, va a q_accept (añadir dígito!)
+
+Resultado final: 1000 ✓ (que es 8 en decimal)
+```
+
+**Verificación:** 111₂ = 4+2+1 = 7₁₀, y 1000₂ = 8₁₀ ✓
+
+---
+
+**Ejecución en "1010" (10₁₀) — caso sin propagación:**
+
+```
+Paso 0: q₀ | [1] 0  1  0  □     Lee 1 → Mueve R
+Paso 1: q₀ |  1 [0] 1  0  □     Lee 0 → Mueve R
+Paso 2: q₀ |  1  0 [1] 0  □     Lee 1 → Mueve R
+Paso 3: q₀ |  1  0  1 [0] □     Lee 0 → Mueve R
+Paso 4: q₀ |  1  0  1  0 [□]    Lee □ → Mueve L, va a q₁
+Paso 5: q₁ |  1  0  1 [0] □     Lee 0 → Escribe 1, va a q_accept (¡sin acarreo!)
+
+Resultado final: 1011 ✓ (que es 11 en decimal)
+```
+
+**Observación:** Si el último dígito es 0, la suma termina inmediatamente sin propagación.
 
 ---
 
@@ -186,17 +276,71 @@ Resultado: 1100 ✓
 **Problema:** Entrada "ab" → Salida "ab#ab" (copiar la cadena después de un separador)
 
 **Estrategia:** 
-1. Marcar un símbolo del input
-2. Moverlo al final
-3. Regresar
-4. Repetir
+1. Primero, ir al final y escribir el separador #
+2. Regresar al inicio
+3. Para cada símbolo: marcarlo, ir al final y escribir una copia, regresar
+4. Repetir hasta que todos estén marcados
 
-Esta MT necesitaría varios estados para:
-- Recordar qué símbolo estamos copiando
-- Navegar entre el origen y el destino
-- Marcar qué ya copiamos
+**Descripción de estados (simplificada):**
 
-(Dejamos los detalles como ejercicio — ¡el patrón es similar!)
+```
+Estado q₀ (ir al final para poner #):
+  - Si veo a, b → muevo R, quedo en q₀
+  - Si veo □ → escribo #, muevo L, voy a q₁
+
+Estado q₁ (regresar al inicio):
+  - Si veo a, b, # → muevo L, quedo en q₁
+  - Si veo □ → muevo R, voy a q₂
+
+Estado q₂ (buscar siguiente símbolo sin marcar):
+  - Si veo A, B → muevo R, quedo en q₂ (saltar marcados)
+  - Si veo a → escribo A (marcar), voy a q₃ₐ (recordamos 'a')
+  - Si veo b → escribo B (marcar), voy a q₃ᵦ (recordamos 'b')
+  - Si veo # → voy a q_accept (¡terminamos!)
+
+Estado q₃ₐ (ir al final y escribir 'a'):
+  - Si veo cualquier símbolo excepto □ → muevo R, quedo en q₃ₐ
+  - Si veo □ → escribo a, muevo L, voy a q₄
+
+Estado q₃ᵦ (ir al final y escribir 'b'):
+  - Si veo cualquier símbolo excepto □ → muevo R, quedo en q₃ᵦ
+  - Si veo □ → escribo b, muevo L, voy a q₄
+
+Estado q₄ (regresar al inicio para buscar siguiente):
+  - Si veo cualquier símbolo excepto □ → muevo L, quedo en q₄
+  - Si veo □ → muevo R, voy a q₂
+```
+
+**Ejecución simplificada en "ab":**
+
+```
+Fase 1: Poner separador
+  q₀ | [a] b  □   →  q₀ |  a [b] □   →  q₀ |  a  b [□]  →  q₁ |  a [b] #
+  (ahora regresamos al inicio)
+  q₁ | [a] b  #   →  q₂ | [a] b  #
+
+Fase 2: Copiar 'a'
+  q₂ | [a] b  #        Lee a → Escribe A (marcar), va a q₃ₐ
+  q₃ₐ| [A] b  #  □     Ir al final...
+  q₃ₐ|  A  b  # [□]    Lee □ → Escribe a, va a q₄
+  (cinta: A b # a)
+  q₄ regresar al inicio...
+  q₂ | [A] b  #  a     Lee A → Mueve R (saltar marcado)
+  q₂ |  A [b] #  a     Lee b → Escribe B (marcar), va a q₃ᵦ
+
+Fase 3: Copiar 'b'
+  q₃ᵦ|  A [B] #  a  □   Ir al final...
+  q₃ᵦ|  A  B  #  a [□]  Lee □ → Escribe b, va a q₄
+  (cinta: A B # a b)
+  q₄ regresar al inicio...
+  q₂ | [A] B  #  a  b   Lee A → Mueve R
+  q₂ |  A [B] #  a  b   Lee B → Mueve R
+  q₂ |  A  B [#] a  b   Lee # → ¡ACEPTA!
+
+Resultado: AB#ab (las A,B son versiones "marcadas" de a,b)
+```
+
+**Nota:** En la salida final, podríamos añadir una fase de "limpieza" que convierta A→a y B→b para obtener exactamente "ab#ab". La MT necesita estados adicionales para recordar qué símbolo está copiando — esto ilustra cómo los estados funcionan como "memoria" temporal.
 
 ---
 
